@@ -6,7 +6,7 @@ let minColor = [26, 32, 44];
 let maxColor = [0, 0, 0];
 
 let upgradeLevel = 0;
-let upgradeCost = 1.1;
+let upgradeCost = 0.1;
 let costDisplay = document.getElementById('upgrade-cost');
 let manualFactor = 0.999;
 let decayFactor = 0.9999;
