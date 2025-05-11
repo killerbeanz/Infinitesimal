@@ -62,11 +62,9 @@
 
     const valueDisplay = document.getElementById('value');
     const circle = document.getElementById('circle');
-    const baseValue = Math.log(Math.log(Math.log(2) + 1));
-
     function getRadius(x) {
-      const term = Math.log(Math.log(Math.log(x + 1) + 1));
-      return baseValue - term;
+      const term = Math.log((-1) * Math.log(x) + 1);
+      return term;
     }
 
     function updateCircleSize() {
