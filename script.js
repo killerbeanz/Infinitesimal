@@ -6,13 +6,13 @@ let minColor = [26, 32, 44];
 let maxColor = [0, 0, 0];
 
 let upgradeLevel = 0;
-let upgradeCost = 0.1;
+let upgradeCost = 0.9;
 let costDisplay = document.getElementById('upgrade-cost');
 let manualFactor = 0.999;
 let decayFactor = 0.9999;
 
 function getRadius(x) {
-  const term = Math.log(Math.log(1 - Math.log(x)) + 1);
+  const term = Math.log(Math.log(Math.log(1 - Math.log(x)) + 1) + 1);
   return term;
 }
 
