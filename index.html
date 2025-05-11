@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Incremental Game to Zero</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #1a202c;
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #circle {
+      position: absolute;
+      background-color: rgba(59, 130, 246, 0.3);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    #ui {
+      z-index: 1;
+      text-align: center;
+    }
+
+    button {
+      background-color: #2563eb;
+      color: white;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1e40af;
+    }
+
+    .value-display {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="circle"></div>
+  <div id="ui">
+    <div class="value-display">Current Value: <span id="value">1.0000</span></div>
+    <button onclick="reduceValue()">Decrease</button>
+  </div>
+
+  <script>
+    let value = 1;
+
+    const valueDisplay = document.getElementById('value');
+    const circle = document.getElementById('circle');
+    const baseValue = Math.log(Math.log(Math.log(2) + 1));
+
+    function getRadius(x) {
+      const term = Math.log(Math.log(Math.log(x + 1) + 1));
+      return baseValue - term;
+    }
+
+    function updateCircleSize() {
+      const minSize = Math.min(window.innerWidth, window.innerHeight);
+      const radiusFactor = getRadius(value);
+      const size = minSize * radiusFactor;
+      circle.style.width = `${size}px`;
+      circle.style.height = `${size}px`;
+      circle.style.left = `${(window.innerWidth - size) / 2}px`;
+      circle.style.top = `${(window.innerHeight - size) / 2}px`;
+    }
+
+    function reduceValue() {
+      value = Math.max(0, value - 0.01);
+      valueDisplay.textContent = value.toFixed(4);
+      updateCircleSize();
+    }
+
+    window.addEventListener('resize', updateCircleSize);
+    updateCircleSize();
+  </script>
+</body>
+</html>
