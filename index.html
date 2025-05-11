@@ -63,7 +63,7 @@
     const valueDisplay = document.getElementById('value');
     const circle = document.getElementById('circle');
     function getRadius(x) {
-      const term = Math.log((-1) * Math.log(x) + 1);
+      const term = Math.log(Math.log(1 - Math.log(x)) + 1);
       return term;
     }
 
