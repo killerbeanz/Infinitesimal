@@ -80,7 +80,7 @@
     }
 
     function reduceValue() {
-      value = Math.max(0, value - 0.01);
+      value = Math.max(0, value * 0.999);
       valueDisplay.textContent = value.toFixed(4);
       updateCircleSize();
     }
