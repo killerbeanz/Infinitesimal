@@ -10,9 +10,6 @@
       background-color: #1a202c;
       color: white;
       font-family: sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       height: 100vh;
       overflow: hidden;
       position: relative;
@@ -24,9 +21,47 @@
       pointer-events: none;
     }
 
-    #ui {
+    #container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 100%;
+      width: 100%;
+      padding: 2rem;
+      box-sizing: border-box;
       z-index: 1;
+    }
+
+    #ui {
       text-align: center;
+    }
+
+    #upgrades {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      text-align: right;
+    }
+
+    #upgrades h2 {
+      margin: 0 0 1rem 0;
+    }
+
+    #upgrades button {
+      margin-bottom: 1rem;
+      width: 200px;
+      background-color: #2563eb;
+      color: white;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    #upgrades button:hover {
+      background-color: #1e40af;
     }
 
     button {
@@ -37,7 +72,7 @@
       border-radius: 0.5rem;
       font-size: 1rem;
       cursor: pointer;
-      margin: 0.25rem;
+      margin-top: 1rem;
     }
 
     button:hover {
@@ -48,19 +83,18 @@
       font-size: 1.5rem;
       margin-bottom: 1rem;
     }
-
-    .upgrades {
-      margin-top: 1rem;
-    }
   </style>
 </head>
 <body>
   <div id="circle"></div>
-  <div id="ui">
-    <div class="value-display">Number: <span id="value">1.0000</span></div>
-    <button onclick="manualReduce()">Manual Decrease</button>
-    <div class="upgrades">
-      <button onclick="buyUpgrade()">Buy Upgrade (Cost: <span id="upgrade-cost">10</span>)</button>
+  <div id="container">
+    <div id="ui">
+      <div class="value-display">Number: <span id="value">1.000000</span></div>
+      <button onclick="manualReduce()">Manual Decrease</button>
+    </div>
+    <div id="upgrades">
+      <h2>Upgrades</h2>
+      <button onclick="buyUpgrade()">Buy Upgrade<br><small>Requires number &lt; <span id="upgrade-cost">1.1</span></small></button>
     </div>
   </div>
 
