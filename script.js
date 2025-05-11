@@ -6,10 +6,10 @@ let minColor = [26, 32, 44];
 let maxColor = [0, 0, 0];
 
 let upgradeLevel = 0;
-let upgradeCost = 10;
+let upgradeCost = 1.1;
 let costDisplay = document.getElementById('upgrade-cost');
-let manualPower = 0.01;
-let decayRate = 0.0005;
+let manualFactor = 0.999;
+let decayFactor = 0.9999;
 
 function getRadius(x) {
   const term = Math.log(Math.log(1 - Math.log(x)) + 1);
@@ -39,27 +39,27 @@ function updateCircleSize() {
 }
 
 function manualReduce() {
-  value = Math.max(0, value - manualPower);
-  valueDisplay.textContent = value.toFixed(4);
+  value *= manualFactor;
+  valueDisplay.textContent = value.toFixed(6);
   updateCircleSize();
 }
 
 function buyUpgrade() {
-  if (value >= upgradeCost) {
-    value -= upgradeCost;
+  if (value < upgradeCost) {
+    value /= upgradeCost;
     upgradeLevel += 1;
-    upgradeCost *= 2;
-    manualPower *= 1.5;
-    decayRate *= 1.2;
-    costDisplay.textContent = upgradeCost.toFixed(2);
-    valueDisplay.textContent = value.toFixed(4);
+    upgradeCost *= 1.5;
+    manualFactor = Math.pow(manualFactor, 1.1);
+    decayFactor = Math.pow(decayFactor, 1.05);
+    costDisplay.textContent = upgradeCost.toFixed(4);
+    valueDisplay.textContent = value.toFixed(6);
   }
 }
 
 function tick() {
   if (value > 0) {
-    value = Math.max(0, value - decayRate);
-    valueDisplay.textContent = value.toFixed(4);
+    value *= decayFactor;
+    valueDisplay.textContent = value.toFixed(6);
     updateCircleSize();
   }
 }
