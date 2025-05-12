@@ -1,6 +1,7 @@
 let value = 1;
 let valueDisplay = document.getElementById('value');
 let circle = document.getElementById('circle');
+let manualButton = document.getElementById('manual-button');
 
 let minColor = [26, 32, 44];
 let maxColor = [0, 0, 0];
@@ -40,6 +41,9 @@ function formatValue(val) {
   return val.toString();
 }
 
+function updateManualButton() {
+  manualButton.textContent = `Multiply by ${manualFactor.toFixed(6)}`;
+}
 
 function updateCircleSize() {
   const minSize = Math.min(window.innerWidth, window.innerHeight);
@@ -71,6 +75,7 @@ function buyUpgrade() {
     decayFactor = Math.pow(decayFactor, 2);
     costDisplay.textContent = formatValue(upgradeCost);
     valueDisplay.textContent = formatValue(value);
+    updateManualButton();
   }
 }
 
@@ -84,4 +89,5 @@ function tick() {
 
 setInterval(tick, 100);
 window.addEventListener('resize', updateCircleSize);
+updateManualButton();
 updateCircleSize();
