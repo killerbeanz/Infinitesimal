@@ -23,6 +23,22 @@ function interpolateColor(min, max, t) {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
+function formatValue(val) {
+  if (val >= 0.000001) {
+    return val.toFixed(6);
+  }
+  const str = val.toExponential();
+  const match = str.match(/e-(\d+)/);
+  if (match) {
+    const exponent = parseInt(match[1], 10);
+    const digits = val.toFixed(exponent + 2).split('.')[1];
+    const significant = digits.replace(/^0+/, '').slice(0, 5).padEnd(5, '0');
+    const zeroCount = exponent - 1;
+    return `0.0-${zeroCount}-${significant}`;
+  }
+  return val.toString();
+}
+
 function updateCircleSize() {
   const minSize = Math.min(window.innerWidth, window.innerHeight);
   const radiusFactor = getRadius(value);
@@ -40,7 +56,7 @@ function updateCircleSize() {
 
 function manualReduce() {
   value *= manualFactor;
-  valueDisplay.textContent = value.toFixed(6);
+  valueDisplay.textContent = formatValue(value);
   updateCircleSize();
 }
 
@@ -51,15 +67,15 @@ function buyUpgrade() {
     upgradeCost /= 1.5;
     manualFactor = Math.pow(manualFactor, 1.1);
     decayFactor = Math.pow(decayFactor, 1.05);
-    costDisplay.textContent = upgradeCost.toFixed(4);
-    valueDisplay.textContent = value.toFixed(6);
+    costDisplay.textContent = formatValue(upgradeCost);
+    valueDisplay.textContent = formatValue(value);
   }
 }
 
 function tick() {
   if (value > 0) {
     value *= decayFactor;
-    valueDisplay.textContent = value.toFixed(6);
+    valueDisplay.textContent = formatValue(value);
     updateCircleSize();
   }
 }
