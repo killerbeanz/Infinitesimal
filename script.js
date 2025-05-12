@@ -84,7 +84,7 @@ function manualReduce() {
 
 function buyManualUpgrade() {
   const upgrade = upgrades.manualMultiplier;
-  if (upgrade.level.le(9)) {
+  if (upgrade.level <= 9) {
     if (value.lt(upgrade.cost)) {
       value = value.div(upgrade.cost);
       upgrade.level += 1;
