@@ -31,13 +31,15 @@ function formatValue(val) {
   const match = str.match(/e-(\d+)/);
   if (match) {
     const exponent = parseInt(match[1], 10);
-    const digits = val.toFixed(exponent + 2).split('.')[1];
+    const precision = Math.min(100, exponent + 2);
+    const digits = val.toFixed(precision).split('.')[1];
     const significant = digits.replace(/^0+/, '').slice(0, 5).padEnd(4, '0');
     const zeroCount = exponent - 1;
-    return `0.0-${zeroCount}-${significant}`;
+    return `0.-(${zeroCount})-${significant}`;
   }
   return val.toString();
 }
+
 
 function updateCircleSize() {
   const minSize = Math.min(window.innerWidth, window.innerHeight);
