@@ -6,9 +6,9 @@ let minColor = [26, 32, 44];
 let maxColor = [0, 0, 0];
 
 let upgradeLevel = 0;
-let upgradeCost = 0.9;
+let upgradeCost = 0.95;
 let costDisplay = document.getElementById('upgrade-cost');
-let manualFactor = 0.999;
+let manualFactor = 0.9995;
 let decayFactor = 0.9999;
 
 function getRadius(x) {
@@ -66,9 +66,9 @@ function buyUpgrade() {
   if (value < upgradeCost) {
     value /= upgradeCost;
     upgradeLevel += 1;
-    upgradeCost /= 1.5;
-    manualFactor = Math.pow(manualFactor, 1.1);
-    decayFactor = Math.pow(decayFactor, 1.05);
+    upgradeCost **= 1.95;
+    manualFactor = Math.pow(manualFactor, 2);
+    decayFactor = Math.pow(decayFactor, 2);
     costDisplay.textContent = formatValue(upgradeCost);
     valueDisplay.textContent = formatValue(value);
   }
