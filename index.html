@@ -17,9 +17,9 @@
 
     #circle {
       position: absolute;
+      z-index: -1;
       border-radius: 50%;
       pointer-events: none;
-      z-index: 0;
     }
 
     #container {
@@ -91,11 +91,11 @@
   <div id="container">
     <div id="ui">
       <div class="value-display">Number: <span id="value">1.000000</span></div>
-      <button onclick="manualReduce()">Manual Decrease</button>
+      <button onclick="manualReduce()">Multiply by (manual decrease)</button>
     </div>
     <div id="upgrades">
       <h2>Upgrades</h2>
-      <button onclick="buyUpgrade()">Buy Upgrade<br><small> &lt; <span id="upgrade-cost">0.95</span></small></button>
+      <button onclick="buyUpgrade()">Square decrease rate<br><small>Requires number &lt; <span id="upgrade-cost">1.1</span></small></button>
     </div>
   </div>
 
