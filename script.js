@@ -1,4 +1,5 @@
-let value = 1;
+// Initialize value as an OmegaNum instance
+let value = new OmegaNum(1);
 let valueDisplay = document.getElementById('value');
 let circle = document.getElementById('circle');
 let manualButton = document.getElementById('manual-button');
@@ -7,14 +8,14 @@ let minColor = [26, 32, 44];
 let maxColor = [0, 0, 0];
 
 let upgradeLevel = 0;
-let baseUpgradeCost = 0.95;
-let upgradeCost = 0.95;
+let baseUpgradeCost = new OmegaNum(0.95);
+let upgradeCost = new OmegaNum(0.95);
 let costDisplay = document.getElementById('upgrade-cost');
-let manualFactor = 0.9995;
-let decayFactor = 0.9999;
+let manualFactor = new OmegaNum(0.9995);
+let decayFactor = new OmegaNum(0.9999);
 
 function getRadius(x) {
-  const term = (1 - Math.log(x)) / 308;
+  const term = (1 - Math.log(x.toNumber())) / 308;
   return term;
 }
 
@@ -26,14 +27,14 @@ function interpolateColor(min, max, t) {
 }
 
 function formatValue(val) {
-  if (val >= 0.000001) {
+  if (val.gte(1e-6)) {
     return val.toFixed(6);
   }
   const str = val.toExponential();
   const match = str.match(/e-(\d+)/);
   if (match) {
     const exponent = parseInt(match[1], 10);
-    const precision = Math.min(100, exponent + 2);
+    const precision = Math.min(100, exponent + 6);
     const digits = val.toFixed(precision).split('.')[1];
     const significant = digits.replace(/^0+/, '').slice(0, 5).padEnd(4, '0');
     const zeroCount = exponent - 1;
@@ -62,18 +63,18 @@ function updateCircleSize() {
 }
 
 function manualReduce() {
-  value *= manualFactor;
+  value = value.mul(manualFactor);
   valueDisplay.textContent = formatValue(value);
   updateCircleSize();
 }
 
 function buyUpgrade() {
-  if (value < upgradeCost) {
-    value /= upgradeCost;
+  if (value.lt(upgradeCost)) {
+    value = value.div(upgradeCost);
     upgradeLevel += 1;
-    upgradeCost = baseUpgradeCost ** (1.95 * (upgradeLevel ** 2));
-    manualFactor = Math.pow(manualFactor, 2);
-    decayFactor = Math.pow(decayFactor, 2);
+    upgradeCost = baseUpgradeCost.pow(1.95 * (upgradeLevel ** 2));
+    manualFactor = manualFactor.pow(2);
+    decayFactor = decayFactor.pow(2);
     costDisplay.textContent = formatValue(upgradeCost);
     valueDisplay.textContent = formatValue(value);
     updateManualButton();
@@ -81,8 +82,8 @@ function buyUpgrade() {
 }
 
 function tick() {
-  if (value > 0) {
-    value *= decayFactor;
+  if (value.gt(0)) {
+    value = value.mul(decayFactor);
     valueDisplay.textContent = formatValue(value);
     updateCircleSize();
   }
