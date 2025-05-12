@@ -43,7 +43,7 @@ function formatValue(val) {
   const match = str.match(/e-(\d+)/);
   if (match) {
     const exponent = parseInt(match[1], 10);
-    const precision = Math.min(100, exponent + 2);
+    const precision = Math.min(100, exponent + 6);
     const digits = val.toFixed(precision).split('.')[1];
     const significant = digits.replace(/^0+/, '').slice(0, 5).padEnd(4, '0');
     const zeroCount = exponent - 1;
@@ -53,7 +53,7 @@ function formatValue(val) {
 }
 
 function updateManualButton() {
-  manualButton.textContent = `Multiply by ${manualFactor.toFixed(6)}`;
+  manualButton.textContent = `Multiply by ${formatValue(manualFactor)}`;
 }
 
 function updateCircleSize() {
@@ -72,7 +72,12 @@ function updateCircleSize() {
 }
 
 function manualReduce() {
-  value = value.mul(manualFactor);
+  let adjustedDecay = manualFactor
+  if (value.lt('1e-100')) {
+      const ratio = new OmegaNum('1e100').div(value);
+      adjustedDecay = manualFactor.root(ratio);
+    }
+  value = value.mul(adjustedDecay);
   valueDisplay.textContent = formatValue(value);
   updateCircleSize();
 }
