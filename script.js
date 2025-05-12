@@ -6,29 +6,22 @@ let manualButton = document.getElementById('manual-button');
 let minColor = [26, 32, 44];
 let maxColor = [0, 0, 0];
 
+let upgrades = {
+  autoDecrease: {
+    purchased: false,
+    cost: new OmegaNum(0.5),
+    button: document.getElementById('auto-upgrade-button')
+  },
+  manualMultiplier: {
+    level: 0,
+    baseCost: new OmegaNum(0.95),
+    cost: new OmegaNum(0.95),
+    button: document.getElementById('manual-upgrade-button')
+  }
+};
+
 let manualFactor = new OmegaNum(0.9995);
 let decayFactor = new OmegaNum(0.9999);
-let decayEnabled = false;
-
-let upgrades = [
-  {
-    name: "Enable Auto Decrease",
-    cost: new OmegaNum(0.5),
-    unlocked: false,
-    action: () => {
-      decayEnabled = true;
-    }
-  },
-  {
-    name: "Square Decrease Rate",
-    cost: new OmegaNum(0.95),
-    unlocked: false,
-    action: () => {
-      manualFactor = manualFactor.pow(2);
-      decayFactor = decayFactor.pow(2);
-    }
-  }
-];
 
 function getRadius(x) {
   const term = (1 - Math.log(x.toNumber())) / 308;
@@ -43,16 +36,15 @@ function interpolateColor(min, max, t) {
 }
 
 function formatValue(val) {
-  if (val.gte(0.000001)) {
-    return val.toNumber().toFixed(6);
+  if (val.gte(1e-6)) {
+    return val.toFixed(6);
   }
-  const num = val.toNumber();
-  const str = num.toExponential();
+  const str = val.toExponential();
   const match = str.match(/e-(\d+)/);
   if (match) {
     const exponent = parseInt(match[1], 10);
     const precision = Math.min(100, exponent + 2);
-    const digits = num.toFixed(precision).split('.')[1];
+    const digits = val.toFixed(precision).split('.')[1];
     const significant = digits.replace(/^0+/, '').slice(0, 5).padEnd(4, '0');
     const zeroCount = exponent - 1;
     return `0.-(${zeroCount})-${significant}`;
@@ -61,7 +53,7 @@ function formatValue(val) {
 }
 
 function updateManualButton() {
-  manualButton.textContent = `Multiply by ${manualFactor.toNumber().toFixed(6)}`;
+  manualButton.textContent = `Multiply by ${manualFactor.toFixed(6)}`;
 }
 
 function updateCircleSize() {
@@ -85,37 +77,39 @@ function manualReduce() {
   updateCircleSize();
 }
 
-function renderUpgrades() {
-  const container = document.getElementById('upgrades');
-  container.innerHTML = '';
-  upgrades.forEach((upg, i) => {
-    if (!upg.unlocked && value.lt(upg.cost)) return;
-
-    const btn = document.createElement('button');
-    btn.textContent = `${upg.name} (Cost: ${formatValue(upg.cost)})`;
-    btn.onclick = () => {
-      if (value.gte(upg.cost)) {
-        value = value.div(upg.cost);
-        upg.action();
-        upg.unlocked = true;
-        valueDisplay.textContent = formatValue(value);
-        updateManualButton();
-        renderUpgrades();
-      }
-    };
-    container.appendChild(btn);
-  });
+function buyManualUpgrade() {
+  const upgrade = upgrades.manualMultiplier;
+  if (value.lt(upgrade.cost)) {
+    value = value.div(upgrade.cost);
+    upgrade.level += 1;
+    upgrade.cost = upgrade.baseCost.pow(1.95 * (upgrade.level ** 2));
+    manualFactor = manualFactor.pow(2);
+    decayFactor = decayFactor.pow(2);
+    upgrade.button.textContent = `Square decrease rate (Cost: ${formatValue(upgrade.cost)})`;
+    valueDisplay.textContent = formatValue(value);
+    updateManualButton();
+  }
 }
 
-function softcapAdjust(x) {
-  if (x.gt('1e-100')) return new OmegaNum(1);
-  return OmegaNum.sqrt(OmegaNum.div('1e-100', x));
+function buyAutoDecrease() {
+  const upgrade = upgrades.autoDecrease;
+  if (!upgrade.purchased && value.lt(upgrade.cost)) {
+    value = value.div(upgrade.cost);
+    upgrade.purchased = true;
+    upgrade.button.disabled = true;
+    upgrade.button.textContent = "Auto decrease purchased";
+    valueDisplay.textContent = formatValue(value);
+  }
 }
 
 function tick() {
-  if (decayEnabled && value.gt(0)) {
-    const decayMultiplier = decayFactor.pow(softcapAdjust(value));
-    value = value.mul(decayMultiplier);
+  if (value.gt(0) && upgrades.autoDecrease.purchased) {
+    let adjustedDecay = decayFactor;
+    if (value.lt('1e-100')) {
+      const ratio = new OmegaNum('1e100').div(value);
+      adjustedDecay = decayFactor.root(ratio);
+    }
+    value = value.mul(adjustedDecay);
     valueDisplay.textContent = formatValue(value);
     updateCircleSize();
   }
@@ -125,4 +119,3 @@ setInterval(tick, 100);
 window.addEventListener('resize', updateCircleSize);
 updateManualButton();
 updateCircleSize();
-renderUpgrades();
