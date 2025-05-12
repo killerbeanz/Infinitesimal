@@ -32,7 +32,7 @@ function formatValue(val) {
   if (match) {
     const exponent = parseInt(match[1], 10);
     const digits = val.toFixed(exponent + 2).split('.')[1];
-    const significant = digits.replace(/^0+/, '').slice(0, 5).padEnd(5, '0');
+    const significant = digits.replace(/^0+/, '').slice(0, 5).padEnd(4, '0');
     const zeroCount = exponent - 1;
     return `0.0-${zeroCount}-${significant}`;
   }
