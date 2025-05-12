@@ -71,7 +71,7 @@ function buyUpgrade() {
   if (value < upgradeCost) {
     value /= upgradeCost;
     upgradeLevel += 1;
-    upgradeCost = baseUpgradeCost ** (1.95 * (upgradeLevel ** 1.2));
+    upgradeCost = baseUpgradeCost ** (1.95 * (upgradeLevel ** 2));
     manualFactor = Math.pow(manualFactor, 2);
     decayFactor = Math.pow(decayFactor, 2);
     costDisplay.textContent = formatValue(upgradeCost);
