@@ -1,4 +1,3 @@
-// Initialize value as an OmegaNum instance
 let value = new OmegaNum(1);
 let valueDisplay = document.getElementById('value');
 let circle = document.getElementById('circle');
@@ -7,12 +6,29 @@ let manualButton = document.getElementById('manual-button');
 let minColor = [26, 32, 44];
 let maxColor = [0, 0, 0];
 
-let upgradeLevel = 0;
-let baseUpgradeCost = new OmegaNum(0.95);
-let upgradeCost = new OmegaNum(0.95);
-let costDisplay = document.getElementById('upgrade-cost');
 let manualFactor = new OmegaNum(0.9995);
 let decayFactor = new OmegaNum(0.9999);
+let decayEnabled = false;
+
+let upgrades = [
+  {
+    name: "Enable Auto Decrease",
+    cost: new OmegaNum(0.5),
+    unlocked: false,
+    action: () => {
+      decayEnabled = true;
+    }
+  },
+  {
+    name: "Square Decrease Rate",
+    cost: new OmegaNum(0.95),
+    unlocked: false,
+    action: () => {
+      manualFactor = manualFactor.pow(2);
+      decayFactor = decayFactor.pow(2);
+    }
+  }
+];
 
 function getRadius(x) {
   const term = (1 - Math.log(x.toNumber())) / 308;
@@ -27,15 +43,16 @@ function interpolateColor(min, max, t) {
 }
 
 function formatValue(val) {
-  if (val.gte(1e-6)) {
-    return val.toFixed(6);
+  if (val.gte(0.000001)) {
+    return val.toNumber().toFixed(6);
   }
-  const str = val.toExponential();
+  const num = val.toNumber();
+  const str = num.toExponential();
   const match = str.match(/e-(\d+)/);
   if (match) {
     const exponent = parseInt(match[1], 10);
     const precision = Math.min(100, exponent + 2);
-    const digits = val.toFixed(precision).split('.')[1];
+    const digits = num.toFixed(precision).split('.')[1];
     const significant = digits.replace(/^0+/, '').slice(0, 5).padEnd(4, '0');
     const zeroCount = exponent - 1;
     return `0.-(${zeroCount})-${significant}`;
@@ -44,7 +61,7 @@ function formatValue(val) {
 }
 
 function updateManualButton() {
-  manualButton.textContent = `Multiply by ${manualFactor.toFixed(6)}`;
+  manualButton.textContent = `Multiply by ${manualFactor.toNumber().toFixed(6)}`;
 }
 
 function updateCircleSize() {
@@ -68,22 +85,37 @@ function manualReduce() {
   updateCircleSize();
 }
 
-function buyUpgrade() {
-  if (value.lt(upgradeCost)) {
-    value = value.div(upgradeCost);
-    upgradeLevel += 1;
-    upgradeCost = baseUpgradeCost.pow(1.95 * (upgradeLevel ** 2));
-    manualFactor = manualFactor.pow(2);
-    decayFactor = decayFactor.pow(2);
-    costDisplay.textContent = formatValue(upgradeCost);
-    valueDisplay.textContent = formatValue(value);
-    updateManualButton();
-  }
+function renderUpgrades() {
+  const container = document.getElementById('upgrades');
+  container.innerHTML = '';
+  upgrades.forEach((upg, i) => {
+    if (!upg.unlocked && value.lt(upg.cost)) return;
+
+    const btn = document.createElement('button');
+    btn.textContent = `${upg.name} (Cost: ${formatValue(upg.cost)})`;
+    btn.onclick = () => {
+      if (value.gte(upg.cost)) {
+        value = value.div(upg.cost);
+        upg.action();
+        upg.unlocked = true;
+        valueDisplay.textContent = formatValue(value);
+        updateManualButton();
+        renderUpgrades();
+      }
+    };
+    container.appendChild(btn);
+  });
+}
+
+function softcapAdjust(x) {
+  if (x.gt('1e-100')) return new OmegaNum(1);
+  return OmegaNum.sqrt(OmegaNum.div('1e-100', x));
 }
 
 function tick() {
-  if (value.gt(0)) {
-    value = value.mul(decayFactor);
+  if (decayEnabled && value.gt(0)) {
+    const decayMultiplier = decayFactor.pow(softcapAdjust(value));
+    value = value.mul(decayMultiplier);
     valueDisplay.textContent = formatValue(value);
     updateCircleSize();
   }
@@ -93,3 +125,4 @@ setInterval(tick, 100);
 window.addEventListener('resize', updateCircleSize);
 updateManualButton();
 updateCircleSize();
+renderUpgrades();
