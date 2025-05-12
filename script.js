@@ -84,15 +84,17 @@ function manualReduce() {
 
 function buyManualUpgrade() {
   const upgrade = upgrades.manualMultiplier;
-  if (value.lt(upgrade.cost)) {
-    value = value.div(upgrade.cost);
-    upgrade.level += 1;
-    upgrade.cost = upgrade.baseCost.pow(1.95 * (upgrade.level ** 2));
-    manualFactor = manualFactor.pow(2);
-    decayFactor = decayFactor.pow(2);
-    upgrade.button.textContent = `Square decrease rate (Cost: ${formatValue(upgrade.cost)})`;
-    valueDisplay.textContent = formatValue(value);
-    updateManualButton();
+  if (upgrade.level.gt(9)) {
+    if (value.lt(upgrade.cost)) {
+      value = value.div(upgrade.cost);
+      upgrade.level += 1;
+      upgrade.cost = upgrade.baseCost.pow(1.95 * (upgrade.level ** 2));
+      manualFactor = manualFactor.pow(2);
+      decayFactor = decayFactor.pow(2);
+      upgrade.button.textContent = `Square decrease rate (Cost: ${formatValue(upgrade.cost)}) ${upgrade.level}/10`;
+      valueDisplay.textContent = formatValue(value);
+      updateManualButton();
+    }
   }
 }
 
