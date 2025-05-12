@@ -12,57 +12,36 @@
       font-family: sans-serif;
       height: 100vh;
       overflow: hidden;
-      position: relative;
+      display: flex;
     }
 
     #circle {
-      position: absolute;
-      z-index: -1;
+      position: fixed;
+      z-index: 0;
       border-radius: 50%;
       pointer-events: none;
     }
 
-    #container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      height: 100%;
-      width: 100%;
-      padding: 2rem;
-      box-sizing: border-box;
+    #main-content {
+      flex: 1;
       z-index: 1;
-    }
-
-    #ui {
-      text-align: center;
-    }
-
-    #upgrades {
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
-      text-align: right;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
     }
 
-    #upgrades h2 {
-      margin: 0 0 1rem 0;
-    }
-
-    #upgrades button {
-      margin-bottom: 1rem;
-      width: 200px;
-      background-color: #2563eb;
-      color: white;
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 0.5rem;
-      font-size: 1rem;
-      cursor: pointer;
-      text-align: left;
-    }
-
-    #upgrades button:hover {
-      background-color: #1e40af;
+    #right-panel {
+      width: 300px;
+      padding: 1rem;
+      background-color: #2d3748;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      overflow-y: auto;
+      z-index: 2;
     }
 
     button {
@@ -73,7 +52,6 @@
       border-radius: 0.5rem;
       font-size: 1rem;
       cursor: pointer;
-      margin-top: 1rem;
     }
 
     button:hover {
@@ -81,25 +59,24 @@
     }
 
     .value-display {
-      font-size: 1.5rem;
+      font-size: 2rem;
       margin-bottom: 1rem;
     }
   </style>
 </head>
 <body>
   <div id="circle"></div>
-  <div id="container">
-    <div id="ui">
-      <div class="value-display">Number: <span id="value">1.000000</span></div>
-      <button id="manual-button" onclick="manualReduce()">Multiply by 0.999000</button>
-    </div>
-    <div id="upgrades">
-      <h2>Upgrades</h2>
-      <button onclick="buyUpgrade()">Square decrease rate<br><small>&lt; <span id="upgrade-cost">0.95</span></small></button>
-    </div>
+
+  <div id="main-content">
+    <div class="value-display">Number: <span id="value">1.000000</span></div>
+    <button id="manual-button" onclick="manualReduce()">Multiply</button>
   </div>
 
-  <script src="OmegaNum.min.js"></script>
+  <div id="right-panel">
+    <div id="upgrades"></div>
+  </div>
+
+  <script src="https://unpkg.com/omeganum@1.0.1/omeganum.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
