@@ -21,7 +21,7 @@ let upgrades = {
 };
 
 let manualFactor = new OmegaNum(0.9995);
-let decayFactor = new OmegaNum(0.9999);
+let decayFactor = new OmegaNum(0.9995);
 
 function getRadius(x) {
   const term = (1 - Math.log(x.toNumber())) / 308;
