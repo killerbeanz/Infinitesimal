@@ -7,6 +7,7 @@ let minColor = [26, 32, 44];
 let maxColor = [0, 0, 0];
 
 let upgradeLevel = 0;
+let baseUpgradeCost = 0.95;
 let upgradeCost = 0.95;
 let costDisplay = document.getElementById('upgrade-cost');
 let manualFactor = 0.9995;
@@ -70,7 +71,7 @@ function buyUpgrade() {
   if (value < upgradeCost) {
     value /= upgradeCost;
     upgradeLevel += 1;
-    upgradeCost **= 1.95;
+    upgradeCost = baseUpgradeCost ** (1.95 * (upgradeLevel ** 1.2));
     manualFactor = Math.pow(manualFactor, 2);
     decayFactor = Math.pow(decayFactor, 2);
     costDisplay.textContent = formatValue(upgradeCost);
