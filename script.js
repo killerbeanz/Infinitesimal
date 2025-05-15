@@ -73,8 +73,8 @@ function updateCircleSize() {
 
 function manualReduce() {
   let adjustedDecay = manualFactor
-  if (value.lt('1e-100')) {
-      const ratio = new OmegaNum('1e100').div(value);
+  if (value.lt('1e-30')) {
+      const ratio = new OmegaNum('1e-30').div(value).log10();
       adjustedDecay = manualFactor.root(ratio);
     }
   value = value.mul(adjustedDecay);
@@ -112,8 +112,8 @@ function buyAutoDecrease() {
 function tick() {
   if (value.gt(0) && upgrades.autoDecrease.purchased) {
     let adjustedDecay = decayFactor;
-    if (value.lt('1e-100')) {
-      const ratio = new OmegaNum('1e100').div(value);
+    if (value.lt('1e-30')) {
+      const ratio = new OmegaNum('1e-30').div(value).log10();
       adjustedDecay = decayFactor.root(ratio);
     }
     value = value.mul(adjustedDecay);
