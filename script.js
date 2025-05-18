@@ -10,13 +10,13 @@ let upgrades = {
   autoShrink: {
     purchased: false,
     cost: new OmegaNum(2),
-    button: document.getElementById('auto-upgrade-button')
+    button: document.getElementById('auto-shrink-upgrade')
   },
   squareShrink: {
     level: 0,
     baseCost: new OmegaNum(1).div(0.95),
     cost: new OmegaNum(1).div(0.95),
-    button: document.getElementById('manual-upgrade-button')
+    button: document.getElementById('square-shrink-upgrade')
   }
 };
 
