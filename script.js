@@ -65,7 +65,7 @@ function updateShrinkButton() {
   if (value.lte(1e30)) {
     shrinkButton.textContent = `Multiply by ${formatValue(adjustedShrinkClick)}`;
   } else {
-    shrinkButton.textContent = `Multiply by ${formatValue(adjustedShrinkClick)} due to being smaller than 0.-(29)-0100`;
+    shrinkButton.textContent = `Multiply by ${formatValue(adjustedShrinkClick)} due to being smaller than 0.-(29)-0999`;
   }
 }
 
