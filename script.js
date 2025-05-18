@@ -60,9 +60,10 @@ function formatValue(value, digits = 4) {
 
 function updateShrinkButton() {
   if (value.lte(1e30)) {
-    shrink_Button.textContent = `Multiply by ${formatValue(shrinkButtonFactor)}`;
+    shrinkButton.textContent = `Multiply by ${formatValue(shrinkButtonFactor)}`;
   } else {
-        shrink_Button.textContent = `Multiply by ${formatValue(adjustedShrinkClick)} due to being smaller than 0.-(30)-1000`;
+    shrinkButton.textContent = `Multiply by ${formatValue(adjustedShrinkClick)} due to being smaller than 0.-(30)-1000`;
+  }
 }
 
 function updateCircleSize() {
@@ -81,11 +82,11 @@ function updateCircleSize() {
 }
 
 function shrinkClick() {
-  adjustedShrinkClick = shrinkClickFactor
+  adjustedShrinkClick = shrinkClickFactor;
   if (value.lt('1e30')) {
-      const ratio = new OmegaNum.div(value, '1e30').ln().mul(OmegaNum.div(value, '1e30'));
-      adjustedShrinkClick = shrinkClickFactor.root(ratio);
-    }
+    const ratio = new OmegaNum.div(value, '1e30').ln().mul(OmegaNum.div(value, '1e30'));
+    adjustedShrinkClick = shrinkClickFactor.root(ratio);
+  }
   value = value.mul(adjustedShrinkClick);
   valueDisplay.textContent = formatValue(value);
   updateCircleSize();
