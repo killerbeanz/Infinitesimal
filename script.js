@@ -60,7 +60,7 @@ function formatValue(value, digits = 4) {
 
 function updateShrinkButton() {
   if (value.lte(1e30)) {
-    shrinkButton.textContent = `Multiply by ${formatValue(shrinkButtonFactor)}`;
+    shrinkButton.textContent = `Multiply by ${formatValue(adjustedShrinkClick)}`;
   } else {
     shrinkButton.textContent = `Multiply by ${formatValue(adjustedShrinkClick)} due to being smaller than 0.-(30)-1000`;
   }
