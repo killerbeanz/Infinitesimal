@@ -74,7 +74,7 @@ function updateCircleSize() {
 function manualReduce() {
   let adjustedDecay = manualFactor
   if (value.lt('1e-30')) {
-      const ratio = new OmegaNum('1e-30').div(value).log10().mul(10);
+      const ratio = new OmegaNum('1e-30').div(value).log10().mul(OmegaNum('1e-30').div(value));
       adjustedDecay = manualFactor.root(ratio);
     }
   value = value.mul(adjustedDecay);
@@ -113,7 +113,7 @@ function tick() {
   if (value.gt(0) && upgrades.autoDecrease.purchased) {
     let adjustedDecay = decayFactor;
     if (value.lt('1e-30')) {
-      const ratio = new OmegaNum('1e-30').div(value).log10().mul(10);
+      const ratio = new OmegaNum('1e-30').div(value).log10().mul(OmegaNum('1e-30').div(value));
       adjustedDecay = decayFactor.root(ratio);
     }
     value = value.mul(adjustedDecay);
@@ -122,7 +122,7 @@ function tick() {
   }
 }
 
-setInterval(tick, 100);
+setInterval(tick, 50);
 window.addEventListener('resize', updateCircleSize);
 updateManualButton();
 updateCircleSize();
