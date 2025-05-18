@@ -85,11 +85,6 @@ function updateCircleSize() {
 }
 
 function shrinkClick() {
-  adjustedShrinkClick = shrinkClickFactor;
-  if (value.gt('1e30')) {
-    const ratio = new OmegaNum.div(value, '1e30').ln().mul(1000);
-    adjustedShrinkClick = shrinkClickFactor.root(ratio);
-  }
   value = value.mul(adjustedShrinkClick);
   valueDisplay.textContent = formatValue(value);
   updateShrinkButton();
@@ -129,6 +124,7 @@ function tick() {
     if (value.gt('1e30')) {
       const ratio = new OmegaNum.div(value, '1e30').ln().mul(1000);
       adjustedShrinkAuto = shrinkAutoFactor.root(ratio);
+      adjustedShrinkClick = shrinkClickFactor.root(ratio);
     }
     value = value.mul(adjustedShrinkAuto);
     valueDisplay.textContent = formatValue(value);
