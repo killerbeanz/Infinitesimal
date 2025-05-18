@@ -1,18 +1,18 @@
 let value = new OmegaNum(1);
-let valueDisplay = document.getElementById('value');
+let valueDisplay = document.getElementById('display-value');
 let circle = document.getElementById('circle');
-let manualButton = document.getElementById('manual-button');
+let shrinkButton = document.getElementById('shrink-button');
 
 let minColor = [26, 32, 44];
 let maxColor = [0, 0, 0];
 
 let upgrades = {
-  autoDecrease: {
+  autoShrink: {
     purchased: false,
     cost: new OmegaNum(0.5),
     button: document.getElementById('auto-upgrade-button')
   },
-  manualMultiplier: {
+  squareShrink: {
     level: 0,
     baseCost: new OmegaNum(0.95),
     cost: new OmegaNum(0.95),
@@ -20,8 +20,10 @@ let upgrades = {
   }
 };
 
-let manualFactor = new OmegaNum(0.9995);
-let decayFactor = new OmegaNum(0.9995);
+let baseShrinkButtonFactor = new OmegaNum(0.9995);
+let shrinkButtonFactor = baseShrinkButtonFactor;
+let baseShrinkAutoFactor = new OmegaNum(0.9995);
+let shrinkAutoFactor = baseShrinkAutoFactor
 
 function getRadius(x) {
   const term = (1 - Math.log(x.toNumber())) / 308;
@@ -52,8 +54,8 @@ function formatValue(val) {
   return val.toString();
 }
 
-function updateManualButton() {
-  manualButton.textContent = `Multiply by ${formatValue(manualFactor)}`;
+function updateShrinkButton() {
+  shrinkButton.textContent = `Multiply by ${formatValue(shrinkButtonFactor)}`;
 }
 
 function updateCircleSize() {
@@ -71,35 +73,35 @@ function updateCircleSize() {
   circle.style.backgroundColor = color;
 }
 
-function manualReduce() {
-  let adjustedDecay = manualFactor
+function shrinkButton() {
+  let adjustedShrink = shrinkButtonFactor
   if (value.lt('1e-30')) {
       const ratio = new OmegaNum('1e-30').div(value).log10().mul(OmegaNum('1e-30').div(value));
-      adjustedDecay = manualFactor.root(ratio);
+      adjustedShrink = shrinkButtonFactor.root(ratio);
     }
-  value = value.mul(adjustedDecay);
+  value = value.mul(adjustedShrink);
   valueDisplay.textContent = formatValue(value);
   updateCircleSize();
 }
 
-function buyManualUpgrade() {
-  const upgrade = upgrades.manualMultiplier;
+function buySquareShrinkUpgrade() {
+  const upgrade = upgrades.squareShrink;
   if (upgrade.level <= 9) {
     if (value.lt(upgrade.cost)) {
       value = value.div(upgrade.cost);
       upgrade.level += 1;
       upgrade.cost = upgrade.baseCost.pow(1.95 * (upgrade.level ** 2));
-      manualFactor = manualFactor.pow(2);
-      decayFactor = decayFactor.pow(2);
-      upgrade.button.textContent = `Square decrease rate (Cost: ${formatValue(upgrade.cost)}) ${upgrade.level}/10`;
+      shrinkButtonFactor = baseShrinkButtonFactor.pow(OmegaNum(2).pow(upgrade.level));
+      shrinkAutoFactor = baseShrinkAutoFactor.pow(OmegaNum(2).pow(upgrade.level));
+      upgrade.button.textContent = `Square shrinking rate (Cost: ${formatValue(upgrade.cost)}) ${upgrade.level}/10`;
       valueDisplay.textContent = formatValue(value);
-      updateManualButton();
+      updateShrinkButton();
     }
   }
 }
 
-function buyAutoDecrease() {
-  const upgrade = upgrades.autoDecrease;
+function buyAutoShrink() {
+  const upgrade = upgrades.autoShrink;
   if (!upgrade.purchased && value.lt(upgrade.cost)) {
     value = value.div(upgrade.cost);
     upgrade.purchased = true;
@@ -110,13 +112,13 @@ function buyAutoDecrease() {
 }
 
 function tick() {
-  if (value.gt(0) && upgrades.autoDecrease.purchased) {
-    let adjustedDecay = decayFactor;
+  if (value.gt(0) && upgrades.autoShrink.purchased) {
+    let adjustedShrink = decayFactor;
     if (value.lt('1e-30')) {
       const ratio = new OmegaNum('1e-30').div(value).log10().mul(OmegaNum('1e-30').div(value));
-      adjustedDecay = decayFactor.root(ratio);
+      adjustedShrink = shrinkAutoFactor.root(ratio);
     }
-    value = value.mul(adjustedDecay);
+    value = value.mul(adjustedShrink);
     valueDisplay.textContent = formatValue(value);
     updateCircleSize();
   }
