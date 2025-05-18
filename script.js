@@ -65,7 +65,7 @@ function updateShrinkButton() {
   if (value.lte(1e30)) {
     shrinkButton.textContent = `Multiply by ${formatValue(adjustedShrinkClick)}`;
   } else {
-    shrinkButton.textContent = `Multiply by ${formatValue(adjustedShrinkClick)} due to being smaller than 0.-(29)-0999`;
+    shrinkButton.textContent = `Multiply by ${formatValue(adjustedShrinkClick)}\ndue to being smaller than 0.-(29)-0999`;
   }
 }
 
@@ -119,17 +119,21 @@ function buyAutoShrink() {
 }
 
 function tick() {
+  updateShrinkButton();
+  updateCircleSize();
+  adjustedShrinkClick = shrinkClickFactor;
+  if (value.gt('1e30')) {
+    const ratio = new OmegaNum.div(value, '1e30').ln().mul(1000);
+    adjustedShrinkClick = shrinkClickFactor.root(ratio);
+  }
   if (value.gt(0) && upgrades.autoShrink.purchased) {
     adjustedShrinkAuto = shrinkAutoFactor;
     if (value.gt('1e30')) {
       const ratio = new OmegaNum.div(value, '1e30').ln().mul(1000);
       adjustedShrinkAuto = shrinkAutoFactor.root(ratio);
-      adjustedShrinkClick = shrinkClickFactor.root(ratio);
     }
     value = value.mul(adjustedShrinkAuto);
     valueDisplay.textContent = formatValue(value);
-    updateShrinkButton();
-    updateCircleSize();
   }
 }
 
