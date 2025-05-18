@@ -42,10 +42,13 @@ function interpolateColor(min, max, t) {
 function formatValue(value, digits = 4) {
   const threshold = new OmegaNum(1e6);
   if (value.gte(threshold)) {
-    const expString = value.toExponential();
+    let expString = value.toExponential();
+    if (expString == 'NaNeNaN') {
+      expString = value.toString();
+    }
     const [mantissa, exponentStr] = expString.split('e');
     const exponent = parseInt(exponentStr, 10);
-    const adjustedExp = exponent;
+    const adjustedExp = exponent - 1;
     const mantissaNum = parseFloat(mantissa);
     const reciprocalMantissa = 1 / mantissaNum;
     const rawDigits = reciprocalMantissa.toFixed(digits + 2).replace('.', '');
@@ -62,7 +65,7 @@ function updateShrinkButton() {
   if (value.lte(1e30)) {
     shrinkButton.textContent = `Multiply by ${formatValue(adjustedShrinkClick)}`;
   } else {
-    shrinkButton.textContent = `Multiply by ${formatValue(adjustedShrinkClick)} due to being smaller than 0.-(30)-1000`;
+    shrinkButton.textContent = `Multiply by ${formatValue(adjustedShrinkClick)} due to being smaller than 0.-(29)-0100`;
   }
 }
 
@@ -84,11 +87,12 @@ function updateCircleSize() {
 function shrinkClick() {
   adjustedShrinkClick = shrinkClickFactor;
   if (value.gt('1e30')) {
-    const ratio = new OmegaNum.div(value, '1e30').ln().mul(OmegaNum.div(value, '1e30'));
+    const ratio = new OmegaNum.div(value, '1e30').ln().mul(1000);
     adjustedShrinkClick = shrinkClickFactor.root(ratio);
   }
   value = value.mul(adjustedShrinkClick);
   valueDisplay.textContent = formatValue(value);
+  updateShrinkButton();
   updateCircleSize();
 }
 
@@ -123,11 +127,12 @@ function tick() {
   if (value.gt(0) && upgrades.autoShrink.purchased) {
     adjustedShrinkAuto = shrinkAutoFactor;
     if (value.gt('1e30')) {
-      const ratio = new OmegaNum.div(value, '1e30').ln().mul(OmegaNum.div(value, '1e30'));
+      const ratio = new OmegaNum.div(value, '1e30').ln().mul(1000);
       adjustedShrinkAuto = shrinkAutoFactor.root(ratio);
     }
     value = value.mul(adjustedShrinkAuto);
     valueDisplay.textContent = formatValue(value);
+    updateShrinkButton();
     updateCircleSize();
   }
 }
