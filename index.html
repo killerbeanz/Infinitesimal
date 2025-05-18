@@ -4,66 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Infinitesimal</title>
-  <style>
-    body {
-      margin: 0;
-      background-color: #1a202c;
-      color: white;
-      font-family: sans-serif;
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-    }
-
-    #circle {
-      position: fixed;
-      z-index: 0;
-      border-radius: 50%;
-      pointer-events: none;
-    }
-
-    #main-content {
-      flex: 1;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      position: relative;
-    }
-
-    #right-panel {
-      width: 300px;
-      padding: 1rem;
-      background-color: #2d3748;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      overflow-y: auto;
-      z-index: 2;
-    }
-
-    button {
-      background-color: #2563eb;
-      color: white;
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 0.5rem;
-      font-size: 1rem;
-      cursor: pointer;
-      white-space: pre-line;
-    }
-
-    button:hover {
-      background-color: #1e40af;
-    }
-
-    .value-display {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div id="circle"></div>
