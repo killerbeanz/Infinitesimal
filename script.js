@@ -1,7 +1,7 @@
 let value = new OmegaNum(1);
 let valueDisplay = document.getElementById('display-value');
 let circle = document.getElementById('circle');
-let shrink_Button = document.getElementById('shrink-button');
+let shrinkButton = document.getElementById('shrink-button');
 
 let minColor = [26, 32, 44];
 let maxColor = [0, 0, 0];
@@ -20,8 +20,8 @@ let upgrades = {
   }
 };
 
-let baseShrinkButtonFactor = new OmegaNum(0.9995);
-let shrinkButtonFactor = baseShrinkButtonFactor;
+let baseShrinkClickFactor = new OmegaNum(0.9995);
+let shrinkClickFactor = baseShrinkClickFactor;
 let baseShrinkAutoFactor = new OmegaNum(0.9995);
 let shrinkAutoFactor = baseShrinkAutoFactor
 
@@ -73,11 +73,11 @@ function updateCircleSize() {
   circle.style.backgroundColor = color;
 }
 
-function shrinkButton() {
-  let adjustedShrink = shrinkButtonFactor
+function shrinkClick() {
+  let adjustedShrink = shrinkClickFactor
   if (value.lt('1e-30')) {
       const ratio = new OmegaNum('1e-30').div(value).log10().mul(OmegaNum('1e-30').div(value));
-      adjustedShrink = shrinkButtonFactor.root(ratio);
+      adjustedShrink = shrinkClickFactor.root(ratio);
     }
   value = value.mul(adjustedShrink);
   valueDisplay.textContent = formatValue(value);
@@ -91,7 +91,7 @@ function buySquareShrinkUpgrade() {
       value = value.div(upgrade.cost);
       upgrade.level += 1;
       upgrade.cost = upgrade.baseCost.pow(1.95 * (upgrade.level ** 2));
-      shrinkButtonFactor = baseShrinkButtonFactor.pow(OmegaNum(2).pow(upgrade.level));
+      shrinkClickFactor = baseShrinkClickFactor.pow(OmegaNum(2).pow(upgrade.level));
       shrinkAutoFactor = baseShrinkAutoFactor.pow(OmegaNum(2).pow(upgrade.level));
       upgrade.button.textContent = `Square shrinking rate (Cost: ${formatValue(upgrade.cost)}) ${upgrade.level}/10`;
       valueDisplay.textContent = formatValue(value);
@@ -126,5 +126,5 @@ function tick() {
 
 setInterval(tick, 50);
 window.addEventListener('resize', updateCircleSize);
-updateManualButton();
+updateShrinkButton();
 updateCircleSize();
