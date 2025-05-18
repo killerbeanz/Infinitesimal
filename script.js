@@ -1,7 +1,7 @@
 let value = new OmegaNum(1);
 let valueDisplay = document.getElementById('display-value');
 let circle = document.getElementById('circle');
-let shrinkButton = document.getElementById('shrink-button');
+let shrink_Button = document.getElementById('shrink-button');
 
 let minColor = [26, 32, 44];
 let maxColor = [0, 0, 0];
@@ -55,7 +55,7 @@ function formatValue(val) {
 }
 
 function updateShrinkButton() {
-  shrinkButton.textContent = `Multiply by ${formatValue(shrinkButtonFactor)}`;
+  shrink_Button.textContent = `Multiply by ${formatValue(shrinkButtonFactor)}`;
 }
 
 function updateCircleSize() {
