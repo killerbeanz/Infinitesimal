@@ -68,13 +68,13 @@
   <div id="circle"></div>
 
   <div id="main-content">
-    <div class="value-display">Number: <span id="value">1.000000</span></div>
-    <button id="manual-button" onclick="manualReduce()">Multiply</button>
+    <div class="value-display">Number: <span id="display-value">1.000000</span></div>
+    <button id="shrink-button" onclick="shrinkButton()">Multiply</button>
   </div>
 
   <div id="right-panel">
-    <button id="manual-upgrade-button" onclick="buyManualUpgrade()">Square decrease rate (Cost: 0.95) 0/10</button>
-    <button id="auto-upgrade-button" onclick="buyAutoDecrease()">Enable auto decrease (Cost: 0.5)</button>
+    <button id="square-shrink-upgrade" onclick="buySquareShrinkUpgrade()">Square decrease rate (Cost: 0.95) 0/10</button>
+    <button id="auto-shrink-upgrade" onclick="buyAutoShrink()">Enable auto decrease (Cost: 0.5)</button>
   </div>
 
   <script src="OmegaNum.js"></script>
