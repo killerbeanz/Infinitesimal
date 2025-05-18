@@ -41,16 +41,16 @@ function interpolateColor(min, max, t) {
 
 function formatValue(value, digits = 4) {
   const threshold = new OmegaNum(1e6);
-
   if (value.gte(threshold)) {
     const expString = value.toExponential();
     const [mantissa, exponentStr] = expString.split('e');
     const exponent = parseInt(exponentStr, 10);
-    const adjustedExp = exponent - 1;
-    const rawDigits = mantissa.replace('.', '');
+    const adjustedExp = exponent;
+    const mantissaNum = parseFloat(mantissa);
+    const reciprocalMantissa = 1 / mantissaNum;
+    const rawDigits = reciprocalMantissa.toFixed(digits + 2).replace('.', '');
     const padded = rawDigits.padEnd(digits, '0');
     const mantissaDigits = padded.slice(0, digits);
-
     return `0.-(${adjustedExp})-${mantissaDigits}`;
   } else {
     const reciprocal = OmegaNum.div(1, value);
