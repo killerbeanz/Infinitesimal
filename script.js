@@ -95,7 +95,7 @@ function shrinkClick() {
 function buySquareShrinkUpgrade() {
   const upgrade = upgrades.squareShrink;
   if (upgrade.level <= 9) {
-    if (value.lt(upgrade.cost)) {
+    if (value.gt(upgrade.cost)) {
       value = value.div(upgrade.cost);
       upgrade.level += 1;
       upgrade.cost = upgrade.baseCost.pow(1.95 * (upgrade.level ** 2));
@@ -110,7 +110,7 @@ function buySquareShrinkUpgrade() {
 
 function buyAutoShrink() {
   const upgrade = upgrades.autoShrink;
-  if (!upgrade.purchased && value.lt(upgrade.cost)) {
+  if (!upgrade.purchased && value.gt(upgrade.cost)) {
     value = value.div(upgrade.cost);
     upgrade.purchased = true;
     upgrade.button.disabled = true;
