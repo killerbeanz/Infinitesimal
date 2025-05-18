@@ -9,24 +9,26 @@ let maxColor = [0, 0, 0];
 let upgrades = {
   autoShrink: {
     purchased: false,
-    cost: new OmegaNum(0.5),
+    cost: new OmegaNum(2),
     button: document.getElementById('auto-upgrade-button')
   },
   squareShrink: {
     level: 0,
-    baseCost: new OmegaNum(0.95),
-    cost: new OmegaNum(0.95),
+    baseCost: new OmegaNum(1).div(0.95),
+    cost: new OmegaNum(1).div(0.95),
     button: document.getElementById('manual-upgrade-button')
   }
 };
 
-let baseShrinkClickFactor = new OmegaNum(0.9995);
+let baseShrinkClickFactor = new OmegaNum(1).div(0.9995);
 let shrinkClickFactor = baseShrinkClickFactor;
-let baseShrinkAutoFactor = new OmegaNum(0.9995);
-let shrinkAutoFactor = baseShrinkAutoFactor
+let adjustedShrinkClick = shrinkClickFactor;
+let baseShrinkAutoFactor = new OmegaNum(1).div(0.9995);
+let shrinkAutoFactor = baseShrinkAutoFactor;
+let adjustedShrinkAuto = shrinkAutoFactor;
 
 function getRadius(x) {
-  const term = (1 - Math.log(x.toNumber())) / 308;
+  const term = Math.log(x.toNumber()) / 308;
   return term;
 }
 
@@ -37,25 +39,30 @@ function interpolateColor(min, max, t) {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
-function formatValue(val) {
-  if (val.gte(1e-6)) {
-    return val.toFixed(6);
+function formatValue(value, digits = 4) {
+  const threshold = new OmegaNum(1e6);
+
+  if (value.gte(threshold)) {
+    const expString = value.toExponential();
+    const [mantissa, exponentStr] = expString.split('e');
+    const exponent = parseInt(exponentStr, 10);
+    const adjustedExp = exponent - 1;
+    const rawDigits = mantissa.replace('.', '');
+    const padded = rawDigits.padEnd(digits, '0');
+    const mantissaDigits = padded.slice(0, digits);
+
+    return `0.-(${adjustedExp})-${mantissaDigits}`;
+  } else {
+    const reciprocal = OmegaNum.div(1, value);
+    return reciprocal.toFixed(6);
   }
-  const str = val.toExponential();
-  const match = str.match(/e-(\d+)/);
-  if (match) {
-    const exponent = parseInt(match[1], 10);
-    const precision = Math.min(100, exponent + 6);
-    const digits = val.toFixed(precision).split('.')[1];
-    const significant = digits.replace(/^0+/, '').slice(0, 5).padEnd(4, '0');
-    const zeroCount = exponent - 1;
-    return `0.-(${zeroCount})-${significant}`;
-  }
-  return val.toString();
 }
 
 function updateShrinkButton() {
-  shrink_Button.textContent = `Multiply by ${formatValue(shrinkButtonFactor)}`;
+  if (value.lte(1e30)) {
+    shrink_Button.textContent = `Multiply by ${formatValue(shrinkButtonFactor)}`;
+  } else {
+        shrink_Button.textContent = `Multiply by ${formatValue(adjustedShrinkClick)} due to being smaller than 0.-(30)-1000`;
 }
 
 function updateCircleSize() {
@@ -74,12 +81,12 @@ function updateCircleSize() {
 }
 
 function shrinkClick() {
-  let adjustedShrink = shrinkClickFactor
-  if (value.lt('1e-30')) {
-      const ratio = new OmegaNum('1e-30').div(value).log10().mul(OmegaNum('1e-30').div(value));
-      adjustedShrink = shrinkClickFactor.root(ratio);
+  adjustedShrinkClick = shrinkClickFactor
+  if (value.lt('1e30')) {
+      const ratio = new OmegaNum.div(value, '1e30').ln().mul(OmegaNum.div(value, '1e30'));
+      adjustedShrinkClick = shrinkClickFactor.root(ratio);
     }
-  value = value.mul(adjustedShrink);
+  value = value.mul(adjustedShrinkClick);
   valueDisplay.textContent = formatValue(value);
   updateCircleSize();
 }
@@ -113,12 +120,12 @@ function buyAutoShrink() {
 
 function tick() {
   if (value.gt(0) && upgrades.autoShrink.purchased) {
-    let adjustedShrink = decayFactor;
-    if (value.lt('1e-30')) {
-      const ratio = new OmegaNum('1e-30').div(value).log10().mul(OmegaNum('1e-30').div(value));
-      adjustedShrink = shrinkAutoFactor.root(ratio);
+    adjustedShrinkAuto = shrinkAutoFactor;
+    if (value.lt('1e30')) {
+      const ratio = new OmegaNum.div(value, '1e30').ln().mul(OmegaNum.div(value, '1e30'));
+      adjustedShrinkAuto = shrinkAutoFactor.root(ratio);
     }
-    value = value.mul(adjustedShrink);
+    value = value.mul(adjustedShrinkAuto);
     valueDisplay.textContent = formatValue(value);
     updateCircleSize();
   }
