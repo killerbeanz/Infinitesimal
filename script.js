@@ -211,7 +211,10 @@ function tick() {
   valueDisplay.textContent = formatValue(value);
 }
 setInterval(tick, 50);
-setInterval(saveGame, 30000);
+setInterval(() => {
+  saveGame();
+  showSavePopup();
+}, 30000);
 window.addEventListener('resize', updateCircleSize);
 updateShrinkButton();
 updateCircleSize();
@@ -232,6 +235,15 @@ function saveGame() {
     softcapRootDivisor: softcapRootDivisor.toString()
   };
   localStorage.setItem('hueShiftGameSave', JSON.stringify(saveData));
+}
+
+const savePopup = document.getElementById('save-popup');
+
+function showSavePopup() {
+  savePopup.classList.add('show');
+  setTimeout(() => {
+    savePopup.classList.remove('show');
+  }, 2000);
 }
 
 function loadGame() {
