@@ -149,7 +149,7 @@ function buyAutoShrink() {
     value = value.div(u.cost);
     u.purchased = true;
     u.button.disabled = true;
-    u.button.textContent = "Auto shirnk purchased";
+    u.button.textContent = "Auto shrink purchased";
   }
 }
 upgrades.autoShrink.button.addEventListener('click', buyAutoShrink);
