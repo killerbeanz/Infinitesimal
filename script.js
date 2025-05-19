@@ -177,8 +177,8 @@ function tick() {
   if (!showHueShiftPrompt && value.gte(OmegaNum(10).mul(OmegaNum(1e30).pow(hueShifts + 1)))) {
     const grantedLevels = Math.min(hueShifts + 1, 10);
     document.getElementById('hue-shift-effects').innerHTML =
-      `This will automatically grant <strong>${grantedLevels}</strong> level${grantedLevels === 1 ? '' : 's'} ` +
-      `of the <em>"Square shrink rate"</em> upgrade and raise the softcap to <strong>0.1</strong>.`;
+      `This will automatically grant<br><strong>${grantedLevels}</strong> level${grantedLevels === 1 ? '' : 's'} ` +
+      `of the <em>"Square shrink rate"</em> upgrade<br>and raise the softcap to <strong>0.1</strong>.`;
     hueShiftModal.style.display = 'flex';
     showHueShiftPrompt = true;
   }
