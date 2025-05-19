@@ -8,7 +8,6 @@ let shrinkButton = document.getElementById('shrink-button');
 // Prestige (Hue Shift) variables
 let hueShifts = 0;
 let softcapRootDivisor = new OmegaNum(1000);
-let hueShiftThreshold = [new OmegaNum('1e31'), new OmegaNum('1e308')];
 let showHueShiftPrompt = false;
 let hueShiftModal = document.getElementById('hue-shift-modal');
 let confirmHueShiftButton = document.getElementById('confirm-hue-shift');
@@ -82,7 +81,7 @@ function interpolateColor(min, max, t) {
 }
 
 function getHueShiftedColor(t) {
-  const shiftFrac = Math.min(hueShifts / 15, 1);
+  const shiftFrac = Math.min(hueShifts / 10, 1);
   const shiftedMin = [
     minColor[0] + shiftFrac * (255 - minColor[0]),
     minColor[1] * (1 - shiftFrac),
@@ -93,7 +92,7 @@ function getHueShiftedColor(t) {
 
 function updateCircleSize() {
   const minSize = Math.min(window.innerWidth, window.innerHeight);
-  const term = Math.log(value.toNumber()) / 308;
+  const term = Math.log10(value.toNumber()) / 308;
   const size = minSize * term;
   const t = Math.min(1, Math.max(0, size / minSize));
   const color = getHueShiftedColor(t);
@@ -120,7 +119,7 @@ function buySquareShrinkUpgrade() {
     u.cost = u.baseCost.pow(1.95 * (u.level ** 2));
     shrinkClickFactor = baseShrinkClickFactor.pow(OmegaNum(2).pow(u.level));
     shrinkAutoFactor = baseShrinkAutoFactor.pow(OmegaNum(2).pow(u.level));
-    u.button.textContent = `Square shrinking rate (Cost: ${formatValue(u.cost)}) ${u.level}/10`;
+    u.button.textContent = `Square shrinking rate\n(Cost: ${formatValue(u.cost)}) ${u.level}/10`;
     valueDisplay.textContent = formatValue(value);
     updateShrinkButton();
   }
@@ -146,10 +145,10 @@ function triggerHueShift() {
   updateBackgroundColor();
   upgrades.squareShrink.level = 0;
   upgrades.squareShrink.cost = upgrades.squareShrink.baseCost;
-  upgrades.squareShrink.button.textContent = `Square shrinking rate (Cost: ${formatValue(upgrades.squareShrink.cost)}) 0/10`;
+  upgrades.squareShrink.button.textContent = `Square shrinking rate\n(Cost: ${formatValue(upgrades.squareShrink.cost)}) 0/10`;
   upgrades.autoShrink.purchased = false;
   upgrades.autoShrink.button.disabled = false;
-  upgrades.autoShrink.button.textContent = `Auto shrink (Cost: ${formatValue(upgrades.autoShrink.cost)})`;
+  upgrades.autoShrink.button.textContent = `Auto shrink\n(Cost: ${formatValue(upgrades.autoShrink.cost)})`;
   shrinkClickFactor = baseShrinkClickFactor;
   shrinkAutoFactor = baseShrinkAutoFactor;
   hueShiftModal.style.display = 'none';
@@ -160,7 +159,7 @@ confirmHueShiftButton.addEventListener('click', triggerHueShift);
 function tick() {
   if (
     !showHueShiftPrompt &&
-    value.gte(hueShiftThreshold[Math.min(hueShifts, hueShiftThreshold.length - 1)])
+    value.gte(OmegaNum(10).mul(OmegaNum(1e30).pow(hueShifts + 1)))
   ) {
     hueShiftModal.style.display = 'flex';
     showHueShiftPrompt = true;
@@ -169,17 +168,27 @@ function tick() {
   updateCircleSize();
   adjustedShrinkClick = shrinkClickFactor;
   if (value.gt('1e30')) {
-    const ratio = value.div('1e30').ln().mul(softcapRootDivisor);
+    const ratio = OmegaNum.max(1, value.div('1e30').ln().mul(softcapRootDivisor));
     adjustedShrinkClick = shrinkClickFactor.root(ratio);
   }
   if (value.gt(0) && upgrades.autoShrink.purchased) {
     adjustedShrinkAuto = shrinkAutoFactor;
     if (value.gt('1e30')) {
-      const ratio = value.div('1e30').ln().mul(softcapRootDivisor);
+      const ratio = OmegaNum.max(1, value.div('1e30').ln().mul(softcapRootDivisor));
       adjustedShrinkAuto = shrinkAutoFactor.root(ratio);
     }
     value = value.mul(adjustedShrinkAuto);
     valueDisplay.textContent = formatValue(value);
+  }
+  let u = upgrades.squareShrink;
+  if (u.level < 10 && value.gt(u.cost) && u.level < hueShifts) {
+    u.level++;
+    u.cost = u.baseCost.pow(1.95 * (u.level ** 2));
+    shrinkClickFactor = baseShrinkClickFactor.pow(OmegaNum(2).pow(u.level));
+    shrinkAutoFactor = baseShrinkAutoFactor.pow(OmegaNum(2).pow(u.level));
+    u.button.textContent = `Square shrinking rate\n(Cost: ${formatValue(u.cost)}) ${u.level}/10`;
+    valueDisplay.textContent = formatValue(value);
+    updateShrinkButton();
   }
 }
 setInterval(tick, 50);
