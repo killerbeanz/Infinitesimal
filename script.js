@@ -36,7 +36,7 @@ function updateFavicon(color) {
 }
 
 function updateBackgroundColor() {
-  const shiftFraction = Math.min(hueShifts / 15, 1);
+  const shiftFraction = Math.min(hueShifts / 10, 1);
   const bgColor = interpolateColor(baseBackgroundColor, redColor, shiftFraction);
   document.body.style.backgroundColor = bgColor;
   updateFavicon(bgColor);
@@ -127,12 +127,11 @@ function updateCircleSize() {
   const requirement = OmegaNum(10).mul(OmegaNum(1e30).pow(hueShifts + 1));
   const reqTerm = Math.log10(requirement.toNumber()) / 308;
   const reqSize = minSize * reqTerm;
-  const markerColor = getHueShiftedColor(t);
 
   const marker = document.getElementById('hue-shift-marker');
   marker.style.width = `${reqSize}px`;
   marker.style.height = `${reqSize}px`;
-  marker.style.borderColor = markerColor;
+  marker.style.borderColor = color;
 }
 
 function shrinkClick() {
