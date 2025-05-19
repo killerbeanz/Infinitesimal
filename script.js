@@ -5,29 +5,19 @@ let valueDisplay = document.getElementById('display-value');
 let circle = document.getElementById('circle');
 let shrinkButton = document.getElementById('shrink-button');
 
-// Add popup for hue shift
-const hueShiftModal = document.createElement('div');
-hueShiftModal.id = 'hue-shift-modal';
-hueShiftModal.style = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.75); z-index:1000; color:white; justify-content:center; align-items:center; flex-direction:column; font-size:24px;';
-hueShiftModal.innerHTML = `
-  <div>You've gotten too small, it's time to Hue Shift.</div>
-  <button id="confirm-hue-shift" style="margin-top:20px; padding:10px 20px; font-size:20px;">Hue Shift</button>
-`;
-document.body.appendChild(hueShiftModal);
-
-const confirmHueShiftButton = document.getElementById('confirm-hue-shift');
-let showHueShiftPrompt = false;
-
 // Prestige (Hue Shift) variables
 let hueShifts = 0;
 let softcapRootDivisor = new OmegaNum(1000);
 let hueShiftThreshold = [new OmegaNum('1e31'), new OmegaNum('1e308')];
+let showHueShiftPrompt = false;
+let hueShiftModal = document.getElementById('hue-shift-modal');
+let confirmHueShiftButton = document.getElementById('confirm-hue-shift');
 
 // Base colors
 let minColor = [26, 32, 44];
 let maxColor = [0, 0, 0];
-const baseBackgroundColor = [26, 32, 44]; // #1a202c from CSS
-const redColor = [255, 0, 0]; // pure red
+const baseBackgroundColor = [26, 32, 44];
+const redColor = [255, 0, 0];
 
 function updateBackgroundColor() {
   const shiftFraction = Math.min(hueShifts / 15, 1);
@@ -76,7 +66,6 @@ function formatValue(value, digits = 4) {
   }
 }
 
-// Update shrink button text
 function updateShrinkButton() {
   if (value.lte('1e30')) {
     shrinkButton.textContent = `Multiply by ${formatValue(adjustedShrinkClick)}`;
@@ -85,7 +74,6 @@ function updateShrinkButton() {
   }
 }
 
-// Interpolate between two colors
 function interpolateColor(min, max, t) {
   const r = Math.round(min[0] * (1 - t) + max[0] * t);
   const g = Math.round(min[1] * (1 - t) + max[1] * t);
@@ -93,7 +81,6 @@ function interpolateColor(min, max, t) {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
-// Get color with hue shift applied
 function getHueShiftedColor(t) {
   const shiftFrac = Math.min(hueShifts / 15, 1);
   const shiftedMin = [
@@ -127,7 +114,7 @@ shrinkButton.addEventListener('click', shrinkClick);
 
 function buySquareShrinkUpgrade() {
   let u = upgrades.squareShrink;
-  if (u.level < 10 && value.gte(u.cost)) {
+  if (u.level < 10 && value.gt(u.cost)) {
     value = value.div(u.cost);
     u.level++;
     u.cost = u.baseCost.pow(1.95 * (u.level ** 2));
@@ -142,63 +129,49 @@ upgrades.squareShrink.button.addEventListener('click', buySquareShrinkUpgrade);
 
 function buyAutoShrink() {
   let u = upgrades.autoShrink;
-  if (!u.purchased && value.gte(u.cost)) {
+  if (!u.purchased && value.gt(u.cost)) {
     value = value.div(u.cost);
     u.purchased = true;
     u.button.disabled = true;
-    u.button.textContent = "Auto decrease purchased";
+    u.button.textContent = "Auto shirnk purchased";
     valueDisplay.textContent = formatValue(value);
   }
 }
 upgrades.autoShrink.button.addEventListener('click', buyAutoShrink);
 
-confirmHueShiftButton.addEventListener('click', () => {
+function triggerHueShift() {
   hueShifts++;
   value = new OmegaNum(1);
   softcapRootDivisor = softcapRootDivisor.div(2);
   updateBackgroundColor();
   upgrades.squareShrink.level = 0;
   upgrades.squareShrink.cost = upgrades.squareShrink.baseCost;
+  upgrades.squareShrink.button.textContent = `Square shrinking rate (Cost: ${formatValue(upgrades.squareShrink.cost)}) 0/10`;
   upgrades.autoShrink.purchased = false;
   upgrades.autoShrink.button.disabled = false;
   upgrades.autoShrink.button.textContent = `Auto shrink (Cost: ${formatValue(upgrades.autoShrink.cost)})`;
-  upgrades.squareShrink.button.textContent = `Square shrinking rate (Cost: ${formatValue(upgrades.squareShrink.cost)}) 0/10`;
   shrinkClickFactor = baseShrinkClickFactor;
   shrinkAutoFactor = baseShrinkAutoFactor;
   hueShiftModal.style.display = 'none';
-});
-
-function autoBuyUpgrades() {
-  const u = upgrades.squareShrink;
-  while (u.level < 10 && value.gte(u.cost)) {
-    u.level++;
-    u.cost = u.baseCost.pow(1.95 * (u.level ** 2));
-    shrinkClickFactor = baseShrinkClickFactor.pow(OmegaNum(2).pow(u.level));
-    shrinkAutoFactor = baseShrinkAutoFactor.pow(OmegaNum(2).pow(u.level));
-    u.button.textContent = `Square shrinking rate (Cost: ${formatValue(u.cost)}) ${u.level}/10`;
-  }
-  const a = upgrades.autoShrink;
-  if (!a.purchased && value.gte(a.cost)) {
-    a.purchased = true;
-    a.button.disabled = true;
-    a.button.textContent = "Auto decrease purchased";
-  }
+  showHueShiftPrompt = false;
 }
+confirmHueShiftButton.addEventListener('click', triggerHueShift);
 
 function tick() {
-  if (!showHueShiftPrompt && value.gte(hueShiftThreshold[Math.min(hueShifts, hueShiftThreshold.length - 1)])) {
+  if (
+    !showHueShiftPrompt &&
+    value.gte(hueShiftThreshold[Math.min(hueShifts, hueShiftThreshold.length - 1)])
+  ) {
     hueShiftModal.style.display = 'flex';
     showHueShiftPrompt = true;
   }
-
+  updateShrinkButton();
   updateCircleSize();
   adjustedShrinkClick = shrinkClickFactor;
   if (value.gt('1e30')) {
     const ratio = value.div('1e30').ln().mul(softcapRootDivisor);
     adjustedShrinkClick = shrinkClickFactor.root(ratio);
   }
-  updateShrinkButton();
-
   if (value.gt(0) && upgrades.autoShrink.purchased) {
     adjustedShrinkAuto = shrinkAutoFactor;
     if (value.gt('1e30')) {
@@ -208,8 +181,6 @@ function tick() {
     value = value.mul(adjustedShrinkAuto);
     valueDisplay.textContent = formatValue(value);
   }
-
-  autoBuyUpgrades();
 }
 setInterval(tick, 50);
 window.addEventListener('resize', updateCircleSize);
