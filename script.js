@@ -276,7 +276,7 @@ function loadGame() {
     upgrades.autoShrink.purchased = saveData.autoShrinkPurchased || false;
 
     // Restore costs and UI for squareShrink
-    upgrades.squareShrink.cost = upgrades.squareShrink.baseCost.pow(1.95 * (upgrades.squareShrink.level ** 2));
+    upgrades.squareShrink.cost = upgrades.squareShrink.baseCost.pow(OmegaNum.min(1, 1.95 * (upgrades.squareShrink.level ** 2)));
     upgrades.squareShrink.button.textContent = `Square shrinking rate (Cost: ${formatValue(upgrades.squareShrink.cost)}) ${upgrades.squareShrink.level}/10`;
 
     // Restore auto shrink button state
