@@ -234,7 +234,7 @@ function saveGame() {
     shrinkAutoFactor: shrinkAutoFactor.toString(),
     softcapRootDivisor: softcapRootDivisor.toString()
   };
-  localStorage.setItem('hueShiftGameSave', JSON.stringify(saveData));
+  localStorage.setItem('GameSave', JSON.stringify(saveData));
 }
 
 const savePopup = document.getElementById('save-popup');
@@ -247,7 +247,7 @@ function showSavePopup() {
 }
 
 function loadGame() {
-  const saveStr = localStorage.getItem('hueShiftGameSave');
+  const saveStr = localStorage.getItem('GameSave');
   if (!saveStr) return;
 
   try {
