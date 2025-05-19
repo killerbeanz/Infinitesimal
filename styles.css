@@ -78,7 +78,7 @@ button:hover {
 }
 
 #hue-shift-marker {
-  position: absolute;
+  position: fixed;
   border: 2px solid;
   border-radius: 50%;
   pointer-events: none;
