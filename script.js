@@ -128,8 +128,7 @@ function updateCircleSize() {
   const requirement = OmegaNum(10).mul(OmegaNum(1e30).pow(hueShifts + 1));
   const reqTerm = Math.log10(requirement.toNumber()) / 308;
   const reqSize = minSize * reqTerm;
-  const reqT = Math.min(1, Math.max(0, reqSize / minSize));
-  const markerColor = getHueShiftedColor(reqT);
+  const markerColor = getHueShiftedColor(t);
 
   const marker = document.getElementById('hue-shift-marker');
   marker.style.width = `${reqSize}px`;
