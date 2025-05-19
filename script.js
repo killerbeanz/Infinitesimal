@@ -8,7 +8,7 @@ let shrinkButton = document.getElementById('shrink-button');
 // Prestige (Hue Shift) variables
 let hueShifts = 0;
 let softcapRootDivisor = new OmegaNum(1000);
-let hueShiftThreshold = [new OmegaNum('1e31')];
+let hueShiftThreshold = [new OmegaNum('1e31'), new OmegaNum('1e308')];
 
 // Base colors
 let minColor = [26, 32, 44];
