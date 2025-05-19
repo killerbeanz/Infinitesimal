@@ -75,3 +75,11 @@ button:hover {
   font-size: 2rem;
   margin-bottom: 1rem;
 }
+
+#hue-shift-marker {
+  position: absolute;
+  border: 2px dashed white;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 500; /* Adjust as needed */
+}
