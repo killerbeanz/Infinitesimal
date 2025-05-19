@@ -52,6 +52,25 @@ button:hover {
   background-color: #1e40af;
 }
 
+#save-popup {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  z-index: 2000;
+}
+#save-popup.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 .value-display {
   font-size: 2rem;
   margin-bottom: 1rem;
