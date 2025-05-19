@@ -35,6 +35,7 @@ body {
   gap: 0.5rem;
   overflow-y: auto;
   z-index: 2;
+  opacity: 0.5;
 }
 
 button {
@@ -78,8 +79,8 @@ button:hover {
 
 #hue-shift-marker {
   position: absolute;
-  border: 2px dashed white;
+  border: 4px solid;
   border-radius: 50%;
   pointer-events: none;
-  z-index: 500; /* Adjust as needed */
+  z-index: 0;
 }
