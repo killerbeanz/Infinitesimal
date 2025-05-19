@@ -213,3 +213,4 @@ setInterval(tick, 50);
 window.addEventListener('resize', updateCircleSize);
 updateShrinkButton();
 updateCircleSize();
+updateBackgroundColor();
