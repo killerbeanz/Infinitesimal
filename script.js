@@ -175,10 +175,8 @@ function triggerHueShift() {
 confirmHueShiftButton.addEventListener('click', triggerHueShift);
 
 function tick() {
-  if (
-    !showHueShiftPrompt &&
-    value.gte(OmegaNum(10).mul(OmegaNum(1e30).pow(hueShifts + 1)))
-  ) {
+  value = OmegaNum.min(value, OmegaNum(2).pow(1024))
+  if (!showHueShiftPrompt && value.gte(OmegaNum(10).mul(OmegaNum(1e30).pow(hueShifts + 1)))) {
     hueShiftModal.style.display = 'flex';
     showHueShiftPrompt = true;
   }
