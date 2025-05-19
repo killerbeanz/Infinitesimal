@@ -18,10 +18,28 @@ let maxColor = [0, 0, 0];
 const baseBackgroundColor = [26, 32, 44];
 const redColor = [255, 0, 0];
 
+function updateFavicon(color) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 64;
+  canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+
+  // Draw a circle
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(32, 32, 30, 0, 2 * Math.PI);
+  ctx.fill();
+
+  // Set as favicon
+  const link = document.getElementById('dynamic-favicon');
+  link.href = canvas.toDataURL('image/png');
+}
+
 function updateBackgroundColor() {
   const shiftFraction = Math.min(hueShifts / 15, 1);
   const bgColor = interpolateColor(baseBackgroundColor, redColor, shiftFraction);
   document.body.style.backgroundColor = bgColor;
+  updateFavicon(bgColor);
 }
 
 // Upgrades
