@@ -9,12 +9,13 @@ body {
 }
 
 #circle {
-  position: fixed;
   z-index: 0;
   border-radius: 50%;
   pointer-events: none;
+  position: fixed;
   top: 50%;
   left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 #main-content {
@@ -80,10 +81,11 @@ button:hover {
 }
 
 #hue-shift-marker {
-  position: fixed;
   border: 2px solid;
   border-radius: 50%;
   pointer-events: none;
+  position: absolute;
   top: 50%;
   left: 50%;
+  transform: translate(-50%, -50%);
 }
