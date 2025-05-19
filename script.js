@@ -138,7 +138,6 @@ function buySquareShrinkUpgrade() {
     shrinkClickFactor = baseShrinkClickFactor.pow(OmegaNum(2).pow(u.level));
     shrinkAutoFactor = baseShrinkAutoFactor.pow(OmegaNum(2).pow(u.level));
     u.button.textContent = `Square shrinking rate\n(Cost: ${formatValue(u.cost)}) ${u.level}/10`;
-    valueDisplay.textContent = formatValue(value);
     updateShrinkButton();
   }
 }
@@ -151,7 +150,6 @@ function buyAutoShrink() {
     u.purchased = true;
     u.button.disabled = true;
     u.button.textContent = "Auto shirnk purchased";
-    valueDisplay.textContent = formatValue(value);
   }
 }
 upgrades.autoShrink.button.addEventListener('click', buyAutoShrink);
@@ -198,7 +196,6 @@ function tick() {
       adjustedShrinkAuto = shrinkAutoFactor.root(ratio);
     }
     value = value.mul(adjustedShrinkAuto);
-    valueDisplay.textContent = formatValue(value);
   }
   let u = upgrades.squareShrink;
   if (u.level < 10 && value.gt(u.cost) && u.level < hueShifts) {
@@ -207,9 +204,9 @@ function tick() {
     shrinkClickFactor = baseShrinkClickFactor.pow(OmegaNum(2).pow(u.level));
     shrinkAutoFactor = baseShrinkAutoFactor.pow(OmegaNum(2).pow(u.level));
     u.button.textContent = `Square shrinking rate\n(Cost: ${formatValue(u.cost)}) ${u.level}/10`;
-    valueDisplay.textContent = formatValue(value);
     updateShrinkButton();
   }
+  valueDisplay.textContent = formatValue(value);
 }
 setInterval(tick, 50);
 window.addEventListener('resize', updateCircleSize);
