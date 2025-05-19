@@ -5,6 +5,19 @@ let valueDisplay = document.getElementById('display-value');
 let circle = document.getElementById('circle');
 let shrinkButton = document.getElementById('shrink-button');
 
+// Add popup for hue shift
+const hueShiftModal = document.createElement('div');
+hueShiftModal.id = 'hue-shift-modal';
+hueShiftModal.style = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.75); z-index:1000; color:white; justify-content:center; align-items:center; flex-direction:column; font-size:24px;';
+hueShiftModal.innerHTML = `
+  <div>You've gotten too small, it's time to Hue Shift.</div>
+  <button id="confirm-hue-shift" style="margin-top:20px; padding:10px 20px; font-size:20px;">Hue Shift</button>
+`;
+document.body.appendChild(hueShiftModal);
+
+const confirmHueShiftButton = document.getElementById('confirm-hue-shift');
+let showHueShiftPrompt = false;
+
 // Prestige (Hue Shift) variables
 let hueShifts = 0;
 let softcapRootDivisor = new OmegaNum(1000);
@@ -82,7 +95,6 @@ function interpolateColor(min, max, t) {
 
 // Get color with hue shift applied
 function getHueShiftedColor(t) {
-  // shift original minColor towards red by hueShifts/15
   const shiftFrac = Math.min(hueShifts / 15, 1);
   const shiftedMin = [
     minColor[0] + shiftFrac * (255 - minColor[0]),
@@ -92,7 +104,6 @@ function getHueShiftedColor(t) {
   return interpolateColor(shiftedMin, maxColor, t);
 }
 
-// Compute circle size and color
 function updateCircleSize() {
   const minSize = Math.min(window.innerWidth, window.innerHeight);
   const term = Math.log(value.toNumber()) / 308;
@@ -106,7 +117,6 @@ function updateCircleSize() {
   circle.style.backgroundColor = color;
 }
 
-// Manual shrink click
 function shrinkClick() {
   value = value.mul(adjustedShrinkClick);
   valueDisplay.textContent = formatValue(value);
@@ -115,10 +125,9 @@ function shrinkClick() {
 }
 shrinkButton.addEventListener('click', shrinkClick);
 
-// Buy upgrades
 function buySquareShrinkUpgrade() {
   let u = upgrades.squareShrink;
-  if (u.level < 10 && value.gt(u.cost)) {
+  if (u.level < 10 && value.gte(u.cost)) {
     value = value.div(u.cost);
     u.level++;
     u.cost = u.baseCost.pow(1.95 * (u.level ** 2));
@@ -133,7 +142,7 @@ upgrades.squareShrink.button.addEventListener('click', buySquareShrinkUpgrade);
 
 function buyAutoShrink() {
   let u = upgrades.autoShrink;
-  if (!u.purchased && value.gt(u.cost)) {
+  if (!u.purchased && value.gte(u.cost)) {
     value = value.div(u.cost);
     u.purchased = true;
     u.button.disabled = true;
@@ -143,34 +152,45 @@ function buyAutoShrink() {
 }
 upgrades.autoShrink.button.addEventListener('click', buyAutoShrink);
 
-function tick() {
-  if (value.gte(hueShiftThreshold[Math.min(hueShifts, hueShiftThreshold .length - 1)])) {
-    hueShifts++;
-    value = new OmegaNum(1);
-    softcapRootDivisor = softcapRootDivisor.div(2);
-    updateBackgroundColor();
-    upgrades.squareShrink.level = 0;
-    upgrades.squareShrink.cost = upgrades.squareShrink.baseCost;
-    upgrades.autoShrink.purchased = false;
-    upgrades.autoShrink.button.disabled = false;
-    upgrades.autoShrink.button.textContent = `Auto shrink (Cost: ${formatValue(upgrades.autoShrink.cost)})`;
-    upgrades.squareShrink.button.textContent = `Square shrinking rate (Cost: ${formatValue(upgrades.squareShrink.cost)}) 0/10`;
-    shrinkClickFactor = baseShrinkClickFactor;
-    shrinkAutoFactor = baseShrinkAutoFactor;
-    let grant = Math.min(hueShifts, 10);
-    for (let i = 0; i < grant; i++) {
-      upgrades.squareShrink.level = i + 1;
-    }
-    let lvl = upgrades.squareShrink.level;
-    upgrades.squareShrink.cost = upgrades.squareShrink.baseCost.pow(1.95 * (lvl ** 2));
-    shrinkClickFactor = baseShrinkClickFactor.pow(OmegaNum(2).pow(lvl));
-    shrinkAutoFactor = baseShrinkAutoFactor.pow(OmegaNum(2).pow(lvl));
-    if (hueShifts > 10) {
-      upgrades.autoShrink.purchased = true;
-      upgrades.autoShrink.button.disabled = true;
-      upgrades.autoShrink.button.textContent = "Auto decrease purchased";
-    }
+confirmHueShiftButton.addEventListener('click', () => {
+  hueShifts++;
+  value = new OmegaNum(1);
+  softcapRootDivisor = softcapRootDivisor.div(2);
+  updateBackgroundColor();
+  upgrades.squareShrink.level = 0;
+  upgrades.squareShrink.cost = upgrades.squareShrink.baseCost;
+  upgrades.autoShrink.purchased = false;
+  upgrades.autoShrink.button.disabled = false;
+  upgrades.autoShrink.button.textContent = `Auto shrink (Cost: ${formatValue(upgrades.autoShrink.cost)})`;
+  upgrades.squareShrink.button.textContent = `Square shrinking rate (Cost: ${formatValue(upgrades.squareShrink.cost)}) 0/10`;
+  shrinkClickFactor = baseShrinkClickFactor;
+  shrinkAutoFactor = baseShrinkAutoFactor;
+  hueShiftModal.style.display = 'none';
+});
+
+function autoBuyUpgrades() {
+  const u = upgrades.squareShrink;
+  while (u.level < 10 && value.gte(u.cost)) {
+    u.level++;
+    u.cost = u.baseCost.pow(1.95 * (u.level ** 2));
+    shrinkClickFactor = baseShrinkClickFactor.pow(OmegaNum(2).pow(u.level));
+    shrinkAutoFactor = baseShrinkAutoFactor.pow(OmegaNum(2).pow(u.level));
+    u.button.textContent = `Square shrinking rate (Cost: ${formatValue(u.cost)}) ${u.level}/10`;
   }
+  const a = upgrades.autoShrink;
+  if (!a.purchased && value.gte(a.cost)) {
+    a.purchased = true;
+    a.button.disabled = true;
+    a.button.textContent = "Auto decrease purchased";
+  }
+}
+
+function tick() {
+  if (!showHueShiftPrompt && value.gte(hueShiftThreshold[Math.min(hueShifts, hueShiftThreshold.length - 1)])) {
+    hueShiftModal.style.display = 'flex';
+    showHueShiftPrompt = true;
+  }
+
   updateCircleSize();
   adjustedShrinkClick = shrinkClickFactor;
   if (value.gt('1e30')) {
@@ -178,6 +198,7 @@ function tick() {
     adjustedShrinkClick = shrinkClickFactor.root(ratio);
   }
   updateShrinkButton();
+
   if (value.gt(0) && upgrades.autoShrink.purchased) {
     adjustedShrinkAuto = shrinkAutoFactor;
     if (value.gt('1e30')) {
@@ -187,6 +208,8 @@ function tick() {
     value = value.mul(adjustedShrinkAuto);
     valueDisplay.textContent = formatValue(value);
   }
+
+  autoBuyUpgrades();
 }
 setInterval(tick, 50);
 window.addEventListener('resize', updateCircleSize);
