@@ -157,7 +157,7 @@ upgrades.autoShrink.button.addEventListener('click', buyAutoShrink);
 function triggerHueShift() {
   hueShifts++;
   value = new OmegaNum(1);
-  softcapRootDivisor = softcapRootDivisor.div(2);
+  softcapRootDivisor = softcapRootDivisor.pow(0.1);
   updateBackgroundColor();
   upgrades.squareShrink.level = 0;
   upgrades.squareShrink.cost = upgrades.squareShrink.baseCost;
