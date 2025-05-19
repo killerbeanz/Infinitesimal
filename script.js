@@ -116,15 +116,14 @@ function updateCircleSize() {
   const size = minSize * term;
   const t = Math.min(1, Math.max(0, size / minSize));
   const color = getHueShiftedColor(t);
-  
+
   // Main circle
+  const circle = document.getElementById('circle');
   circle.style.width = `${size}px`;
   circle.style.height = `${size}px`;
-  circle.style.left = `${(window.innerWidth - size) / 2}px`;
-  circle.style.top = `${(window.innerHeight - size) / 2}px`;
   circle.style.backgroundColor = color;
 
-  // Hue Shift Marker Circle
+  // Hue Shift Marker
   const requirement = OmegaNum(10).mul(OmegaNum(1e30).pow(hueShifts + 1));
   const reqTerm = Math.log10(requirement.toNumber()) / 308;
   const reqSize = minSize * reqTerm;
@@ -133,8 +132,6 @@ function updateCircleSize() {
   const marker = document.getElementById('hue-shift-marker');
   marker.style.width = `${reqSize}px`;
   marker.style.height = `${reqSize}px`;
-  marker.style.left = `${(window.innerWidth - reqSize) / 2}px`;
-  marker.style.top = `${(window.innerHeight - reqSize) / 2}px`;
   marker.style.borderColor = markerColor;
 }
 
