@@ -65,6 +65,8 @@ let baseShrinkAutoFactor = new OmegaNum(1).div(0.9995);
 let shrinkAutoFactor = baseShrinkAutoFactor;
 let adjustedShrinkAuto = shrinkAutoFactor;
 
+loadGame();
+
 // Utility: format value display
 function formatValue(value, digits = 4) {
   const threshold = new OmegaNum(1e6);
@@ -209,7 +211,63 @@ function tick() {
   valueDisplay.textContent = formatValue(value);
 }
 setInterval(tick, 50);
+setInterval(saveGame, 30000);
 window.addEventListener('resize', updateCircleSize);
 updateShrinkButton();
 updateCircleSize();
 updateBackgroundColor();
+
+
+
+
+
+function saveGame() {
+  const saveData = {
+    value: value.toString(),
+    hueShifts: hueShifts,
+    squareShrinkLevel: upgrades.squareShrink.level,
+    autoShrinkPurchased: upgrades.autoShrink.purchased,
+    shrinkClickFactor: shrinkClickFactor.toString(),
+    shrinkAutoFactor: shrinkAutoFactor.toString(),
+    softcapRootDivisor: softcapRootDivisor.toString()
+  };
+  localStorage.setItem('hueShiftGameSave', JSON.stringify(saveData));
+}
+
+function loadGame() {
+  const saveStr = localStorage.getItem('hueShiftGameSave');
+  if (!saveStr) return;
+
+  try {
+    const saveData = JSON.parse(saveStr);
+    value = new OmegaNum(saveData.value);
+    hueShifts = saveData.hueShifts || 0;
+
+    // Restore upgrades
+    upgrades.squareShrink.level = saveData.squareShrinkLevel || 0;
+    upgrades.autoShrink.purchased = saveData.autoShrinkPurchased || false;
+
+    // Restore costs and UI for squareShrink
+    upgrades.squareShrink.cost = upgrades.squareShrink.baseCost.pow(1.95 * (upgrades.squareShrink.level ** 2));
+    upgrades.squareShrink.button.textContent = `Square shrinking rate (Cost: ${formatValue(upgrades.squareShrink.cost)}) ${upgrades.squareShrink.level}/10`;
+
+    // Restore auto shrink button state
+    upgrades.autoShrink.button.disabled = upgrades.autoShrink.purchased;
+    upgrades.autoShrink.button.textContent = upgrades.autoShrink.purchased ? "Auto shrink purchased" : `Auto shrink (Cost: ${formatValue(upgrades.autoShrink.cost)})`;
+
+    // Restore shrink factors
+    shrinkClickFactor = new OmegaNum(saveData.shrinkClickFactor);
+    shrinkAutoFactor = new OmegaNum(saveData.shrinkAutoFactor);
+
+    // Restore softcap divisor
+    softcapRootDivisor = new OmegaNum(saveData.softcapRootDivisor);
+
+    // Update display for value and shrink button
+    valueDisplay.textContent = formatValue(value);
+    updateShrinkButton();
+    updateCircleSize();
+
+  } catch(e) {
+    console.error('Failed to load save:', e);
+  }
+}
