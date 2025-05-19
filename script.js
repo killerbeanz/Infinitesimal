@@ -127,11 +127,12 @@ function updateCircleSize() {
   const requirement = OmegaNum(10).mul(OmegaNum(1e30).pow(hueShifts + 1));
   const reqTerm = Math.log10(requirement.toNumber()) / 308;
   const reqSize = minSize * reqTerm;
+  const markerColor = getHueShiftedColor(t);
 
   const marker = document.getElementById('hue-shift-marker');
   marker.style.width = `${reqSize}px`;
   marker.style.height = `${reqSize}px`;
-  marker.style.borderColor = color;
+  marker.style.borderColor = markerColor;
 }
 
 function shrinkClick() {
@@ -186,7 +187,7 @@ function triggerHueShift() {
 confirmHueShiftButton.addEventListener('click', triggerHueShift);
 
 function tick() {
-  value = OmegaNum.min(value, OmegaNum(2).pow(1024).mul(10))
+  value = OmegaNum.min(value,OmegaNum.min(OmegaNum(10).mul(OmegaNum(1e30).pow(hueShifts + 1)), OmegaNum(2).pow(1024).mul(10)))
   if (!showHueShiftPrompt && value.gte(OmegaNum(10).mul(OmegaNum(1e30).pow(hueShifts + 1)))) {
     const grantedLevels = Math.min(hueShifts + 1, 10);
     document.getElementById('hue-shift-effects').innerHTML =
