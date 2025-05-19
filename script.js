@@ -1,11 +1,28 @@
+// script.js
+// Core game variables
 let value = new OmegaNum(1);
 let valueDisplay = document.getElementById('display-value');
 let circle = document.getElementById('circle');
 let shrinkButton = document.getElementById('shrink-button');
 
+// Prestige (Hue Shift) variables
+let hueShifts = 0;
+let softcapRootDivisor = new OmegaNum(1000);
+let hueShiftThreshold = [new OmegaNum('1e31')];
+
+// Base colors
 let minColor = [26, 32, 44];
 let maxColor = [0, 0, 0];
+const baseBackgroundColor = [26, 32, 44]; // #1a202c from CSS
+const redColor = [255, 0, 0]; // pure red
 
+function updateBackgroundColor() {
+  const shiftFraction = Math.min(hueShifts / 15, 1);
+  const bgColor = interpolateColor(baseBackgroundColor, redColor, shiftFraction);
+  document.body.style.backgroundColor = bgColor;
+}
+
+// Upgrades
 let upgrades = {
   autoShrink: {
     purchased: false,
@@ -20,6 +37,7 @@ let upgrades = {
   }
 };
 
+// Shrink factors
 let baseShrinkClickFactor = new OmegaNum(1).div(0.9995);
 let shrinkClickFactor = baseShrinkClickFactor;
 let adjustedShrinkClick = shrinkClickFactor;
@@ -27,11 +45,34 @@ let baseShrinkAutoFactor = new OmegaNum(1).div(0.9995);
 let shrinkAutoFactor = baseShrinkAutoFactor;
 let adjustedShrinkAuto = shrinkAutoFactor;
 
-function getRadius(x) {
-  const term = Math.log(x.toNumber()) / 308;
-  return term;
+// Utility: format value display
+function formatValue(value, digits = 4) {
+  const threshold = new OmegaNum(1e6);
+  if (value.gte(threshold)) {
+    let expString = value.toExponential();
+    if (expString === 'NaNeNaN') expString = value.toString();
+    const [mantissa, exponentStr] = expString.split('e');
+    const exponent = parseInt(exponentStr, 10) - 1;
+    const mantissaNum = parseFloat(mantissa);
+    const reciprocal = 1 / mantissaNum;
+    const raw = reciprocal.toFixed(digits + 2).replace('.', '').padEnd(digits, '0');
+    const digitsStr = raw.slice(0, digits);
+    return `0.-(${exponent})-${digitsStr}`;
+  } else {
+    return OmegaNum.div(1, value).toFixed(6);
+  }
 }
 
+// Update shrink button text
+function updateShrinkButton() {
+  if (value.lte('1e30')) {
+    shrinkButton.textContent = `Multiply by ${formatValue(adjustedShrinkClick)}`;
+  } else {
+    shrinkButton.textContent = `Multiply by ${formatValue(adjustedShrinkClick)}\ndue to being smaller than 0.-(29)-0999`;
+  }
+}
+
+// Interpolate between two colors
 function interpolateColor(min, max, t) {
   const r = Math.round(min[0] * (1 - t) + max[0] * t);
   const g = Math.round(min[1] * (1 - t) + max[1] * t);
@@ -39,44 +80,25 @@ function interpolateColor(min, max, t) {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
-function formatValue(value, digits = 4) {
-  const threshold = new OmegaNum(1e6);
-  if (value.gte(threshold)) {
-    let expString = value.toExponential();
-    if (expString == 'NaNeNaN') {
-      expString = value.toString();
-    }
-    const [mantissa, exponentStr] = expString.split('e');
-    const exponent = parseInt(exponentStr, 10);
-    const adjustedExp = exponent - 1;
-    const mantissaNum = parseFloat(mantissa);
-    const reciprocalMantissa = 1 / mantissaNum;
-    const rawDigits = reciprocalMantissa.toFixed(digits + 2).replace('.', '');
-    const padded = rawDigits.padEnd(digits, '0');
-    const mantissaDigits = padded.slice(0, digits);
-    return `0.-(${adjustedExp})-${mantissaDigits}`;
-  } else {
-    const reciprocal = OmegaNum.div(1, value);
-    return reciprocal.toFixed(6);
-  }
+// Get color with hue shift applied
+function getHueShiftedColor(t) {
+  // shift original minColor towards red by hueShifts/15
+  const shiftFrac = Math.min(hueShifts / 15, 1);
+  const shiftedMin = [
+    minColor[0] + shiftFrac * (255 - minColor[0]),
+    minColor[1] * (1 - shiftFrac),
+    minColor[2] * (1 - shiftFrac)
+  ];
+  return interpolateColor(shiftedMin, maxColor, t);
 }
 
-function updateShrinkButton() {
-  if (value.lte(1e30)) {
-    shrinkButton.textContent = `Multiply by ${formatValue(adjustedShrinkClick)}`;
-  } else {
-    shrinkButton.textContent = `Multiply by ${formatValue(adjustedShrinkClick)}\ndue to being smaller than 0.-(29)-0999`;
-  }
-}
-
+// Compute circle size and color
 function updateCircleSize() {
   const minSize = Math.min(window.innerWidth, window.innerHeight);
-  const radiusFactor = getRadius(value);
-  const size = minSize * radiusFactor;
-
+  const term = Math.log(value.toNumber()) / 308;
+  const size = minSize * term;
   const t = Math.min(1, Math.max(0, size / minSize));
-  const color = interpolateColor(minColor, maxColor, t);
-
+  const color = getHueShiftedColor(t);
   circle.style.width = `${size}px`;
   circle.style.height = `${size}px`;
   circle.style.left = `${(window.innerWidth - size) / 2}px`;
@@ -84,59 +106,88 @@ function updateCircleSize() {
   circle.style.backgroundColor = color;
 }
 
+// Manual shrink click
 function shrinkClick() {
   value = value.mul(adjustedShrinkClick);
   valueDisplay.textContent = formatValue(value);
   updateShrinkButton();
   updateCircleSize();
 }
+shrinkButton.addEventListener('click', shrinkClick);
 
+// Buy upgrades
 function buySquareShrinkUpgrade() {
-  const upgrade = upgrades.squareShrink;
-  if (upgrade.level <= 9) {
-    if (value.gt(upgrade.cost)) {
-      value = value.div(upgrade.cost);
-      upgrade.level += 1;
-      upgrade.cost = upgrade.baseCost.pow(1.95 * (upgrade.level ** 2));
-      shrinkClickFactor = baseShrinkClickFactor.pow(OmegaNum(2).pow(upgrade.level));
-      shrinkAutoFactor = baseShrinkAutoFactor.pow(OmegaNum(2).pow(upgrade.level));
-      upgrade.button.textContent = `Square shrinking rate (Cost: ${formatValue(upgrade.cost)}) ${upgrade.level}/10`;
-      valueDisplay.textContent = formatValue(value);
-      updateShrinkButton();
-    }
+  let u = upgrades.squareShrink;
+  if (u.level < 10 && value.gt(u.cost)) {
+    value = value.div(u.cost);
+    u.level++;
+    u.cost = u.baseCost.pow(1.95 * (u.level ** 2));
+    shrinkClickFactor = baseShrinkClickFactor.pow(OmegaNum(2).pow(u.level));
+    shrinkAutoFactor = baseShrinkAutoFactor.pow(OmegaNum(2).pow(u.level));
+    u.button.textContent = `Square shrinking rate (Cost: ${formatValue(u.cost)}) ${u.level}/10`;
+    valueDisplay.textContent = formatValue(value);
+    updateShrinkButton();
   }
 }
+upgrades.squareShrink.button.addEventListener('click', buySquareShrinkUpgrade);
 
 function buyAutoShrink() {
-  const upgrade = upgrades.autoShrink;
-  if (!upgrade.purchased && value.gt(upgrade.cost)) {
-    value = value.div(upgrade.cost);
-    upgrade.purchased = true;
-    upgrade.button.disabled = true;
-    upgrade.button.textContent = "Auto decrease purchased";
+  let u = upgrades.autoShrink;
+  if (!u.purchased && value.gt(u.cost)) {
+    value = value.div(u.cost);
+    u.purchased = true;
+    u.button.disabled = true;
+    u.button.textContent = "Auto decrease purchased";
     valueDisplay.textContent = formatValue(value);
   }
 }
+upgrades.autoShrink.button.addEventListener('click', buyAutoShrink);
 
 function tick() {
-  updateShrinkButton();
+  if (value.gte(hueShiftThreshold[Math.min(hueShifts, hueShiftThreshold .length - 1)])) {
+    hueShifts++;
+    value = new OmegaNum(1);
+    softcapRootDivisor = softcapRootDivisor.div(2);
+    updateBackgroundColor();
+    upgrades.squareShrink.level = 0;
+    upgrades.squareShrink.cost = upgrades.squareShrink.baseCost;
+    upgrades.autoShrink.purchased = false;
+    upgrades.autoShrink.button.disabled = false;
+    upgrades.autoShrink.button.textContent = `Auto shrink (Cost: ${formatValue(upgrades.autoShrink.cost)})`;
+    upgrades.squareShrink.button.textContent = `Square shrinking rate (Cost: ${formatValue(upgrades.squareShrink.cost)}) 0/10`;
+    shrinkClickFactor = baseShrinkClickFactor;
+    shrinkAutoFactor = baseShrinkAutoFactor;
+    let grant = Math.min(hueShifts, 10);
+    for (let i = 0; i < grant; i++) {
+      upgrades.squareShrink.level = i + 1;
+    }
+    let lvl = upgrades.squareShrink.level;
+    upgrades.squareShrink.cost = upgrades.squareShrink.baseCost.pow(1.95 * (lvl ** 2));
+    shrinkClickFactor = baseShrinkClickFactor.pow(OmegaNum(2).pow(lvl));
+    shrinkAutoFactor = baseShrinkAutoFactor.pow(OmegaNum(2).pow(lvl));
+    if (hueShifts > 10) {
+      upgrades.autoShrink.purchased = true;
+      upgrades.autoShrink.button.disabled = true;
+      upgrades.autoShrink.button.textContent = "Auto decrease purchased";
+    }
+  }
   updateCircleSize();
   adjustedShrinkClick = shrinkClickFactor;
   if (value.gt('1e30')) {
-    const ratio = new OmegaNum.div(value, '1e30').ln().mul(1000);
+    const ratio = value.div('1e30').ln().mul(softcapRootDivisor);
     adjustedShrinkClick = shrinkClickFactor.root(ratio);
   }
+  updateShrinkButton();
   if (value.gt(0) && upgrades.autoShrink.purchased) {
     adjustedShrinkAuto = shrinkAutoFactor;
     if (value.gt('1e30')) {
-      const ratio = new OmegaNum.div(value, '1e30').ln().mul(1000);
+      const ratio = value.div('1e30').ln().mul(softcapRootDivisor);
       adjustedShrinkAuto = shrinkAutoFactor.root(ratio);
     }
     value = value.mul(adjustedShrinkAuto);
     valueDisplay.textContent = formatValue(value);
   }
 }
-
 setInterval(tick, 50);
 window.addEventListener('resize', updateCircleSize);
 updateShrinkButton();
