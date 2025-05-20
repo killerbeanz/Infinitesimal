@@ -136,6 +136,10 @@ function updateCircleSize() {
 }
 
 function shrinkClick() {
+  if (value.gt('1e30')) {
+    const ratio = OmegaNum.max(1, value.div('1e30').ln().mul(1000).pow(softcapPower));
+    adjustedShrinkClick = shrinkClickFactor.root(ratio);
+  }
   value = value.mul(adjustedShrinkClick);
   valueDisplay.textContent = formatValue(value);
   updateShrinkButton();
