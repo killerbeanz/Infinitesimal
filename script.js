@@ -244,7 +244,7 @@ function saveGame() {
     autoShrinkPurchased: upgrades.autoShrink.purchased,
     shrinkClickFactor: shrinkClickFactor.toString(),
     shrinkAutoFactor: shrinkAutoFactor.toString(),
-    softcapRootDivisor: softcapRootDivisor.toString()
+    softcapRootDivisor: softcapPower.toString()
   };
   localStorage.setItem('GameSave', JSON.stringify(saveData));
 }
