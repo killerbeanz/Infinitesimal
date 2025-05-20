@@ -55,11 +55,23 @@ let antiholeUpgrades = {
     level: 0,
     baseCost: new OmegaNum(1.5),
     cost: new OmegaNum(1.5),
-    button: document.getElementById('antihole-upgrade')
+    button: document.getElementById('antihole-square-limit')
+  },
+  keepAuto: {
+    purchased: false,
+    cost: new OmegaNum(5),
+    button: document.getElementById('antihole-keep-auto')
+  },
+  divideByThree: {
+    level: 0,
+    baseCost: new OmegaNum(10),
+    cost: new OmegaNum(10),
+    button: document.getElementById('antihole-divide-rate')
   }
 };
 
 // Shrink factors
+let shrinkDivide = new OmegaNum(1)
 let baseShrinkClickFactor = new OmegaNum(1).div(0.9995);
 let shrinkClickFactor = baseShrinkClickFactor;
 let adjustedShrinkClick = shrinkClickFactor;
@@ -160,8 +172,8 @@ function buySquareShrinkUpgrade() {
     value = value.div(u.cost);
     u.level++;
     u.cost = u.baseCost.pow(1.95 * (u.level ** 2));
-    shrinkClickFactor = baseShrinkClickFactor.pow(OmegaNum(2).pow(u.level));
-    shrinkAutoFactor = baseShrinkAutoFactor.pow(OmegaNum(2).pow(u.level));
+    shrinkClickFactor = baseShrinkClickFactor.pow(OmegaNum(2).pow(u.level)).mul(shrinkDivide);
+    shrinkAutoFactor = baseShrinkAutoFactor.pow(OmegaNum(2).pow(u.level)).mul(shrinkDivide);
     u.button.textContent = `Square shrinking rate\n(Cost: ${formatValue(u.cost)}) ${u.level}/${squareShrinkMaxLevel}`;
     updateShrinkButton();
   }
@@ -179,7 +191,7 @@ function buyAutoShrink() {
 }
 upgrades.autoShrink.button.addEventListener('click', buyAutoShrink);
 
-function buyAntiholeUpgrade() {
+function buyAntiholeUpgrade1() {
   let au = antiholeUpgrades.squareLimit;
   let u = upgrades.squareShrink;
   if (au.level < 10 && antiholeSize.gt(au.cost)) {
@@ -194,7 +206,36 @@ function buyAntiholeUpgrade() {
     u.button.textContent = `Square shrinking rate\n(Cost: ${formatValue(u.cost)}) ${u.level}/${squareShrinkMaxLevel}`;
   }
 }
-antiholeUpgrades.squareLimit.button.addEventListener('click', buyAntiholeUpgrade);
+antiholeUpgrades.squareLimit.button.addEventListener('click', buyAntiholeUpgrade1);
+
+function buyAntiholeUpgrade2() {
+  let au = antiholeUpgrades.keepAuto;
+  if !au.purchased && antiholeSize.gt(au.cost)) {
+    antiholeSize = antiholeSize.div(au.cost);
+    au.purchased = true;
+    au.button.disabled = true;
+    au.button.textContent = "Auto shrink kept";
+    displayAntihole.textContent = formatValue(antiholeSize);
+  }
+}
+antiholeUpgrades.keepAuto.button.addEventListener('click', buyAntiholeUpgrade2);
+
+function buyAntiholeUpgrade3() {
+  let au = antiholeUpgrades.divideByThree;
+  if (au.level < 5 && antiholeSize.gt(au.cost)) {
+    antiholeSize = antiholeSize.div(au.cost);
+    au.level++;
+    au.cost = au.baseCost.pow(Math.max(1, 5 * (au.level ** 2)));
+    shrinkDivide = OmegaNum(3).pow(au.level);
+    shrinkClickFactor = baseShrinkClickFactor.mul(shrinkDivide);
+    shrinkAutoFactor = baseShrinkAutoFactor.mul(shrinkDivide);
+    au.button.textContent = 
+      `Divide the shrinking rate by 3\n` +
+      `(Cost: ${formatValue(au.cost)}) ${au.level}/5`;
+    displayAntihole.textContent = formatValue(antiholeSize);
+  }
+}
+antiholeUpgrades.divideByThree.button.addEventListener('click', buyAntiholeUpgrade3);    
 
 function triggerHueShift() {
   hueShifts++;
@@ -225,10 +266,12 @@ function resetGameProgress() {
   upgrades.squareShrink.cost = upgrades.squareShrink.baseCost;
   upgrades.squareShrink.button.textContent = 
     `Square shrinking rate\n(Cost: ${formatValue(upgrades.squareShrink.baseCost)}) 0/${squareShrinkMaxLevel}`;
-  upgrades.autoShrink.purchased = false;
-  upgrades.autoShrink.button.disabled = false;
-  upgrades.autoShrink.button.textContent = 
-    `Auto shrink\n(Cost: ${formatValue(upgrades.autoShrink.cost)})`;
+  if (!antiholeUpgrades.keepAuto.purchased) {
+    upgrades.autoShrink.purchased = false;
+    upgrades.autoShrink.button.disabled = false;
+    upgrades.autoShrink.button.textContent = 
+      `Auto shrink\n(Cost: ${formatValue(upgrades.autoShrink.cost)})`;
+  }
   shrinkClickFactor = baseShrinkClickFactor;
   shrinkAutoFactor = baseShrinkAutoFactor;
   updateBackgroundColor();
