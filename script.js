@@ -181,6 +181,7 @@ upgrades.autoShrink.button.addEventListener('click', buyAutoShrink);
 
 function buyAntiholeUpgrade() {
   let au = antiholeUpgrades.squareLimit;
+  let u = upgrades.squareShrink;
   if (au.level < 10 && antiholeSize.gt(au.cost)) {
     antiholeSize = antiholeSize.div(au.cost);
     au.level++;
@@ -190,6 +191,7 @@ function buyAntiholeUpgrade() {
       `Add 1 to the "Square shrinking rate" upgrade limit\n` +
       `(Cost: ${formatValue(au.cost)}) ${au.level}/10`;
     displayAntihole.textContent = formatValue(antiholeSize);
+    u.button.textContent = `Square shrinking rate\n(Cost: ${formatValue(u.cost)}) ${u.level}/${squareShrinkMaxLevel}`;
   }
 }
 antiholeUpgrades.squareLimit.button.addEventListener('click', buyAntiholeUpgrade);
