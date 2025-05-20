@@ -171,11 +171,11 @@ upgrades.autoShrink.button.addEventListener('click', buyAutoShrink);
 function triggerHueShift() {
   hueShifts++;
   value = new OmegaNum(1);
-  softcapRootDivisor = softcapPower.mul(0.1);
+  softcapPower = softcapPower.mul(0.1);
   updateBackgroundColor();
   upgrades.squareShrink.level = 0;
   upgrades.squareShrink.cost = upgrades.squareShrink.baseCost;
-  upgrades.squareShrink.button.textContent = `Square shrinking rate\n(Cost: ${formatValue(upgrades.squareShrink.cost)}) 0/10`;
+  upgrades.squareShrink.button.textContent = `Square shrinking rate\n(Cost: ${formatValue(upgrades.squareShrink.baseCost)}) 0/10`;
   upgrades.autoShrink.purchased = false;
   upgrades.autoShrink.button.disabled = false;
   upgrades.autoShrink.button.textContent = `Auto shrink\n(Cost: ${formatValue(upgrades.autoShrink.cost)})`;
@@ -273,11 +273,11 @@ function loadGame() {
 
     // Restore costs and UI for squareShrink
     upgrades.squareShrink.cost = upgrades.squareShrink.baseCost.pow(OmegaNum.min(1, 1.95 * (upgrades.squareShrink.level ** 2)));
-    upgrades.squareShrink.button.textContent = `Square shrinking rate (Cost: ${formatValue(upgrades.squareShrink.cost)}) ${upgrades.squareShrink.level}/10`;
+    upgrades.squareShrink.button.textContent = `Square shrinking rate\n(Cost: ${formatValue(upgrades.squareShrink.baseCost)}) ${upgrades.squareShrink.level}/10`;
 
     // Restore auto shrink button state
     upgrades.autoShrink.button.disabled = upgrades.autoShrink.purchased;
-    upgrades.autoShrink.button.textContent = upgrades.autoShrink.purchased ? "Auto shrink purchased" : `Auto shrink (Cost: ${formatValue(upgrades.autoShrink.cost)})`;
+    upgrades.autoShrink.button.textContent = upgrades.autoShrink.purchased ? "Auto shrink purchased" : `Auto shrink\n(Cost: ${formatValue(upgrades.autoShrink.cost)})`;
 
     // Restore shrink factors
     shrinkClickFactor = new OmegaNum(saveData.shrinkClickFactor);
