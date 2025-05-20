@@ -395,10 +395,23 @@ let maxColor = [0, 0, 0];
 const baseBackgroundColor = [26, 32, 44];
 const redColor = [255, 0, 0];
 
+function updateFavicon(color) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 64;
+  canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(32, 32, 30, 0, 2 * Math.PI);
+  ctx.fill();
+  document.getElementById('dynamic-favicon').href = canvas.toDataURL('image/png');
+}
+
 function updateBackgroundColor() {
   const shiftFraction = Math.min(hueShifts / 10, 1);
   const bgColor = interpolateColor(baseBackgroundColor, redColor, shiftFraction);
   document.body.style.backgroundColor = bgColor;
+  updateFavicon(bgColor);  // ← re‑fire favicon draw here
 }
 
 updateBackgroundColor();
