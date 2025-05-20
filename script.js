@@ -411,7 +411,7 @@ function loadGame() {
     // Antihole restore
     antiholeUnlocked = d.antiholeUnlocked || false;
     antiholeSize = new OmegaNum(d.antiholeSize || 1);
-    shrinkDivide = new Omeganum(d.shrinkDivide || 1);
+    shrinkDivide = new OmegaNum(d.shrinkDivide || 1);
     antiholeUpgrades.squareLimit.level = d.antiholeUpgrade1Level || 0;
     antiholeUpgrades.squareLimit.cost = new OmegaNum(d.antiholeUpgrade1Cost || 1.5);
     antiholeUpgrades.keepAuto.purchased = d.antiholeUpgrade2Level || false;
