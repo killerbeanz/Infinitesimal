@@ -1,4 +1,3 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,52 +5,59 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Infinitesimal</title>
   <link rel="stylesheet" href="styles.css" />
-  <!-- Dynamic favicon link (“funicon”) -->
   <link id="dynamic-favicon" rel="icon" type="image/png" href="">
 </head>
 <body>
   <div id="circle"></div>
   <div id="hue-shift-marker"></div>
 
-  <div id="main-content">
-    <div class="value-display">
-      <span id="display-value">1.000000</span>
-    </div>
-    <button id="shrink-button">Multiply</button>
-  </div>
-
-  <!-- Sidebar Tabs (unlocked after Antihole) -->
-  <div id="sidebar" class="sidebar-tabs" style="display:none;">
+  <!-- LEFT sidebar -->
+  <div id="sidebar" class="sidebar-tabs">
     <button id="tab-shrinking" class="tab active">Shrinking</button>
-    <button id="tab-antihole" class="tab">Antihole</button>
+    <button id="tab-antihole"   class="tab">Antihole</button>
   </div>
 
-  <div id="right-panel">
-    <div id="shrinking-panel">
-      <button id="square-shrink-upgrade">
-        Square shrink rate<br>(Cost: 0.950000) 0/10
-      </button>
-      <button id="auto-shrink-upgrade">
-        Enable auto shrink<br>(Cost: 0.500000)
-      </button>
-    </div>
-    <div id="antihole-panel" style="display:none;">
+  <!-- MAIN area (content + right-panel) -->
+  <div class="container">
+    <div id="main-content">
       <div class="value-display">
-        <span id="display-antihole">1.000000</span>
+        <span id="display-value">1.000000</span>
       </div>
-      <button id="antihole-upgrade">
-        Add 1 to the "Square shrinking rate" upgrade limit<br>
-        (Cost: 1.500000) 0/10
-      </button>
+      <button id="shrink-button">Multiply</button>
+    </div>
+
+    <div id="right-panel">
+      <!-- Shrinking Panel -->
+      <div id="shrinking-panel">
+        <button id="square-shrink-upgrade">
+          Square shrink rate<br>(Cost: 0.950000) 0/10
+        </button>
+        <button id="auto-shrink-upgrade">
+          Enable auto shrink<br>(Cost: 2.000000)
+        </button>
+      </div>
+
+      <!-- Antihole Panel -->
+      <div id="antihole-panel" style="display:none;">
+        <div class="value-display">
+          <span id="display-antihole">1.000000</span>
+        </div>
+        <button id="antihole-upgrade">
+          Add 1 to the "Square shrinking rate" upgrade limit<br>
+          (Cost: 1.500000) 0/10
+        </button>
+      </div>
     </div>
   </div>
 
+  <!-- Hue Shift Modal -->
   <div id="hue-shift-modal" class="modal" style="display:none;">
     <div>You've gotten too small, it's time to Hue Shift.</div>
     <button id="confirm-hue-shift">Hue Shift</button>
     <p id="hue-shift-effects"></p>
   </div>
 
+  <!-- Antihole Modal -->
   <div id="antihole-modal" class="modal" style="display:none;">
     <div>You have dug a hole! Throw it into the Antihole to shrink it in half.</div>
     <button id="confirm-antihole">Throw in the hole</button>
