@@ -357,8 +357,8 @@ function tick() {
   if (u.level < squareShrinkMaxLevel && value.gt(u.cost) && u.level < hueShifts) {
     u.level++;
     u.cost = u.baseCost.pow(1.95 * (u.level ** 2));
-    shrinkClickFactor = baseShrinkClickFactor.pow(OmegaNum(2).pow(u.level));
-    shrinkAutoFactor = baseShrinkAutoFactor.pow(OmegaNum(2).pow(u.level));
+    shrinkClickFactor = baseShrinkClickFactor.pow(OmegaNum(2).pow(u.level)).mul(shrinkDivide);
+    shrinkAutoFactor = baseShrinkAutoFactor.pow(OmegaNum(2).pow(u.level)).mul(shrinkDivide);
     u.button.textContent = 
       `Square shrinking rate\n(Cost: ${formatValue(u.cost)}) ${u.level}/${squareShrinkMaxLevel}`;
     updateShrinkButton();
@@ -384,8 +384,13 @@ function saveGame() {
     // Antihole
     antiholeUnlocked,
     antiholeSize: antiholeSize.toString(),
-    antiholeUpgradeLevel: antiholeUpgrades.squareLimit.level,
-    antiholeUpgradeCost: antiholeUpgrades.squareLimit.cost.toString()
+    shrinkDivide: shrinkDivide.toString(),
+    antiholeUpgrade1Level: antiholeUpgrades.squareLimit.level,
+    antiholeUpgrade1Cost: antiholeUpgrades.squareLimit.cost.toString(),
+    antiholeUpgrade2Level: antiholeUpgrades.keepAuto.purchased,
+    antiholeUpgrade2Cost: antiholeUpgrades.keepAuto.cost.toString(),
+    antiholeUpgrade3Level: antiholeUpgrades.divideByThree.level,
+    antiholeUpgrade3Cost: antiholeUpgrades.divideByThree.cost.toString()
   };
   localStorage.setItem('GameSave', JSON.stringify(saveData));
 }
@@ -406,8 +411,13 @@ function loadGame() {
     // Antihole restore
     antiholeUnlocked = d.antiholeUnlocked || false;
     antiholeSize = new OmegaNum(d.antiholeSize || 1);
-    antiholeUpgrades.squareLimit.level = d.antiholeUpgradeLevel || 0;
-    antiholeUpgrades.squareLimit.cost = new OmegaNum(d.antiholeUpgradeCost || 1.5);
+    shrinkDivide = new Omeganum(d.shrinkDivide || 1);
+    antiholeUpgrades.squareLimit.level = d.antiholeUpgrade1Level || 0;
+    antiholeUpgrades.squareLimit.cost = new OmegaNum(d.antiholeUpgrade1Cost || 1.5);
+    antiholeUpgrades.keepAuto.purchased = d.antiholeUpgrade2Level || false;
+    antiholeUpgrades.keepAuto.cost = new OmegaNum(d.antiholeUpgrade2Cost || 5);
+    antiholeUpgrades.divideByThree.level = d.antiholeUpgrade3Level || 0;
+    antiholeUpgrades.divideByThree.cost = new OmegaNum(d.antiholeUpgrade3Cost || 10);
     squareShrinkMaxLevel = 10 + antiholeUpgrades.squareLimit.level;
 
     // Update UI text
@@ -423,6 +433,13 @@ function loadGame() {
     antiholeUpgrades.squareLimit.button.textContent =
       `Add 1 to the "Square shrinking rate" upgrade limit\n` +
       `(Cost: ${formatValue(antiholeUpgrades.squareLimit.cost)}) ${antiholeUpgrades.squareLimit.level}/10`;
+    antiholeUpgrades.keepAuto.button.textContent =
+      antiholeUpgrades.keepAuto.purchased
+        ? "Auto shrink kept"
+        : `Keep auto shrink\n(Cost: ${formatValue(antiholeUpgrades.keepAuto.cost)})`;
+    antiholeUpgrades.divideByThree.button.textContent =
+      `Divide the shrinking rate by 3\n` +
+      `(Cost: ${formatValue(antiholeUpgrades.divideByThree.cost)}) ${antiholeUpgrades.divideByThree.level}/5`;
     displayAntihole.textContent = formatValue(antiholeSize);
 
     updateUIVisibility();
