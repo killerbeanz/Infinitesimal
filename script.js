@@ -272,8 +272,8 @@ function resetGameProgress() {
     upgrades.autoShrink.button.textContent = 
       `Auto shrink\n(Cost: ${formatValue(upgrades.autoShrink.cost)})`;
   }
-  shrinkClickFactor = baseShrinkClickFactor;
-  shrinkAutoFactor = baseShrinkAutoFactor;
+  shrinkClickFactor = baseShrinkClickFactor.mul(shrinkDivide);
+  shrinkAutoFactor = baseShrinkAutoFactor.mul(shrinkDivide);
   updateBackgroundColor();
   updateShrinkButton();
   updateCircleSize();
