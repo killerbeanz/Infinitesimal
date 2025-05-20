@@ -195,7 +195,7 @@ antiholeUpgrades.squareLimit.button.addEventListener('click', buyAntiholeUpgrade
 
 function triggerHueShift() {
   hueShifts++;
-  softcapPower = softcapPower.pow(.5);
+  softcapPower = softcapPower.mul(.5);
   resetGameProgress();
   hueShiftModal.style.display = 'none';
   showHueShiftPrompt = false;
