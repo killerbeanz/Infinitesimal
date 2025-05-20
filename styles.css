@@ -8,57 +8,51 @@ body {
   position: relative;
 }
 
-/* container holds main-content + right-panel side by side */
-.container {
-  display: flex;
-  margin-left: 180px; /* leave space for left sidebar */
-  height: 100%;
-}
-
-/* LEFT sidebar */
-.sidebar-tabs {
+/* LEFT‑SIDEBAR */
+#sidebar {
   position: fixed;
-  top: 20px;
-  left: 20px;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
+  gap: 0;
   z-index: 2;
 }
-.sidebar-tabs .tab {
-  width: 150px;
-  padding: 0.5rem;
-  background: #2d3748;
-  border: 2px solid #000;
-  border-bottom: none;
+
+#sidebar .tab {
+  background-color: #2d3748;
+  border: none;
+  border-right: 2px solid #000;
+  padding: 1rem 0.5rem;
+  width: 120px;
   text-align: center;
   cursor: pointer;
-  white-space: nowrap;
-}
-.sidebar-tabs .tab:last-child {
-  border-bottom: 2px solid #000;
-}
-.sidebar-tabs .tab.active {
-  background: #1e40af;
+  color: #e2e8f0;
 }
 
-#circle, #hue-shift-marker {
-  pointer-events: none;
-  position: fixed;
+#sidebar .tab:first-child {
+  border-top-left-radius: 8px;
+}
+
+#sidebar .tab:last-child {
+  border-bottom-left-radius: 8px;
+  border-top: 1px solid #000;
+}
+
+#sidebar .tab.active {
+  background-color: #1e40af;
+  color: #fff;
+}
+
+/* MAIN CONTENT (centered) */
+#main-content {
+  position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  border-radius: 50%;
-  z-index: 0;
-}
-
-#main-content {
-  flex: 1;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   text-align: center;
+  z-index: 1;
 }
 
 .value-display {
@@ -66,18 +60,22 @@ body {
   margin-bottom: 1rem;
 }
 
+/* RIGHT PANEL (upgrades) */
 #right-panel {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
   width: 300px;
-  padding: 1rem;
   background-color: #2d3748;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  overflow-y: auto;
   z-index: 2;
-  opacity: 0.9;
 }
 
+/* Buttons */
 button {
   background-color: #2563eb;
   color: white;
@@ -88,8 +86,44 @@ button {
   cursor: pointer;
   white-space: pre-line;
 }
+
 button:hover {
   background-color: #1e40af;
+}
+
+/* Circle & Marker (unchanged) */
+#circle, #hue-shift-marker {
+  pointer-events: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+#hue-shift-marker {
+  border: 2px solid white;
+}
+
+/* Modals & Save popup (unchanged) */
+.modal {
+  display: flex;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.75);
+  z-index: 1000;
+  color: white;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-size: 1.25rem;
+}
+.modal button {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
 }
 
 #save-popup {
@@ -109,24 +143,4 @@ button:hover {
 #save-popup.show {
   opacity: 1;
   pointer-events: auto;
-}
-
-/* Modals */
-.modal {
-  display: flex;
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background-color: rgba(0,0,0,0.75);
-  z-index: 1000;
-  color: white;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  font-size: 1.25rem;
-}
-.modal button {
-  margin-top: 1rem;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
 }
