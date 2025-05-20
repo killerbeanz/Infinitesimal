@@ -248,7 +248,7 @@ function saveGame() {
     autoShrinkPurchased: upgrades.autoShrink.purchased,
     shrinkClickFactor: shrinkClickFactor.toString(),
     shrinkAutoFactor: shrinkAutoFactor.toString(),
-    softcapRootDivisor: softcapPower.toString()
+    softcapPower: softcapPower.toString()
   };
   localStorage.setItem('GameSave', JSON.stringify(saveData));
 }
@@ -288,7 +288,7 @@ function loadGame() {
     shrinkAutoFactor = new OmegaNum(saveData.shrinkAutoFactor);
 
     // Restore softcap divisor
-    softcapRootDivisor = new OmegaNum(saveData.softcapRootDivisor);
+    softcapPower = new OmegaNum(saveData.softcapPower);
 
     // Update display for value and shrink button
     valueDisplay.textContent = formatValue(value);
