@@ -12,7 +12,8 @@ const redColor = [255, 0, 0];
 
 // Prestige (Hue Shift) variables
 let hueShifts = 0;
-let softcapPower = new OmegaNum(1);
+let baseSoftcapPower = new OmegaNum(1);
+let softcapPower = baseSoftcapPower;
 let showHueShiftPrompt = false;
 let hueShiftModal = document.getElementById('hue-shift-modal');
 let confirmHueShiftButton = document.getElementById('confirm-hue-shift');
@@ -195,7 +196,7 @@ antiholeUpgrades.squareLimit.button.addEventListener('click', buyAntiholeUpgrade
 
 function triggerHueShift() {
   hueShifts++;
-  softcapPower = softcapPower.mul(.5);
+  softcapPower = baseSoftcapPower.mul(OmegaNum.pow(.5, hueShifts));
   resetGameProgress();
   hueShiftModal.style.display = 'none';
   showHueShiftPrompt = false;
