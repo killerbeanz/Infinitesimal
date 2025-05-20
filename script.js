@@ -210,7 +210,7 @@ antiholeUpgrades.squareLimit.button.addEventListener('click', buyAntiholeUpgrade
 
 function buyAntiholeUpgrade2() {
   let au = antiholeUpgrades.keepAuto;
-  if !au.purchased && antiholeSize.gt(au.cost)) {
+  if (!au.purchased && antiholeSize.gt(au.cost)) {
     antiholeSize = antiholeSize.div(au.cost);
     au.purchased = true;
     au.button.disabled = true;
