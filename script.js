@@ -4,6 +4,12 @@ let valueDisplay = document.getElementById('display-value');
 let circle = document.getElementById('circle');
 let shrinkButton = document.getElementById('shrink-button');
 
+// Base colors
+let minColor = [26, 32, 44];
+let maxColor = [0, 0, 0];
+const baseBackgroundColor = [26, 32, 44];
+const redColor = [255, 0, 0];
+
 // Prestige (Hue Shift) variables
 let hueShifts = 0;
 let softcapPower = new OmegaNum(1);
@@ -389,12 +395,6 @@ setInterval(() => {
 }, 30000);
 
 window.addEventListener('resize', updateCircleSize);
-
-// Base colors
-let minColor = [26, 32, 44];
-let maxColor = [0, 0, 0];
-const baseBackgroundColor = [26, 32, 44];
-const redColor = [255, 0, 0];
 
 function updateFavicon(color) {
   const canvas = document.createElement('canvas');
