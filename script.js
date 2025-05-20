@@ -171,7 +171,7 @@ upgrades.autoShrink.button.addEventListener('click', buyAutoShrink);
 function triggerHueShift() {
   hueShifts++;
   value = new OmegaNum(1);
-  softcapPower = softcapPower.mul(0.1);
+  softcapPower = softcapPower.mul(0.5);
   updateBackgroundColor();
   upgrades.squareShrink.level = 0;
   upgrades.squareShrink.cost = upgrades.squareShrink.baseCost;
@@ -192,7 +192,7 @@ function tick() {
     const grantedLevels = Math.min(hueShifts + 1, 10);
     document.getElementById('hue-shift-effects').innerHTML =
       `This will automatically grant<br><strong>${grantedLevels}</strong> level${grantedLevels === 1 ? '' : 's'} ` +
-      `of the <em>"Square shrinking rate"</em> upgrade<br>and raise the softcap by <strong>0.1</strong>.`;
+      `of the <em>"Square shrinking rate"</em> upgrade<br>and square root the softcap.`;
     hueShiftModal.style.display = 'flex';
     showHueShiftPrompt = true;
   }
