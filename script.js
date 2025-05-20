@@ -7,7 +7,7 @@ let shrinkButton = document.getElementById('shrink-button');
 
 // Prestige (Hue Shift) variables
 let hueShifts = 0;
-let softcapRootDivisor = new OmegaNum(1000);
+let softcapPower = new OmegaNum(1);
 let showHueShiftPrompt = false;
 let hueShiftModal = document.getElementById('hue-shift-modal');
 let confirmHueShiftButton = document.getElementById('confirm-hue-shift');
@@ -171,7 +171,7 @@ upgrades.autoShrink.button.addEventListener('click', buyAutoShrink);
 function triggerHueShift() {
   hueShifts++;
   value = new OmegaNum(1);
-  softcapRootDivisor = softcapRootDivisor.pow(0.1);
+  softcapRootDivisor = softcapPower.mul(0.1);
   updateBackgroundColor();
   upgrades.squareShrink.level = 0;
   upgrades.squareShrink.cost = upgrades.squareShrink.baseCost;
@@ -200,13 +200,13 @@ function tick() {
   updateCircleSize();
   adjustedShrinkClick = shrinkClickFactor;
   if (value.gt('1e30')) {
-    const ratio = OmegaNum.max(1, value.div('1e30').ln().mul(softcapRootDivisor));
+    const ratio = OmegaNum.max(1, value.div('1e30').ln().mul(1000).pow(softcapPower));
     adjustedShrinkClick = shrinkClickFactor.root(ratio);
   }
   if (value.gt(0) && upgrades.autoShrink.purchased) {
     adjustedShrinkAuto = shrinkAutoFactor;
     if (value.gt('1e30')) {
-      const ratio = OmegaNum.max(1, value.div('1e30').ln().mul(softcapRootDivisor));
+      const ratio = OmegaNum.max(1, value.div('1e30').ln().mul(1000).pow(softcapPower));
       adjustedShrinkAuto = shrinkAutoFactor.root(ratio);
     }
     value = value.mul(adjustedShrinkAuto);
