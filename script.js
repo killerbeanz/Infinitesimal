@@ -196,7 +196,7 @@ function tick() {
     const grantedLevels = Math.min(hueShifts + 1, 10);
     document.getElementById('hue-shift-effects').innerHTML =
       `This will automatically grant<br><strong>${grantedLevels}</strong> level${grantedLevels === 1 ? '' : 's'} ` +
-      `of the <em>"Square shrinking rate"</em> upgrade<br>and square root the softcap.`;
+      `of the <em>"Square shrinking rate"</em> upgrade when affordable<br>and square root the softcap.`;
     hueShiftModal.style.display = 'flex';
     showHueShiftPrompt = true;
   }
