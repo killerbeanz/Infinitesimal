@@ -1,8 +1,9 @@
+
 // Core game variables
 let value = new OmegaNum(1);
-let valueDisplay = document.getElementById('display-value');
-let circle = document.getElementById('circle');
-let shrinkButton = document.getElementById('shrink-button');
+let valueDisplay = document.getElementById("display-value");
+let circle = document.getElementById("circle");
+let shrinkButton = document.getElementById("shrink-button");
 
 // Base colors
 let minColor = [26, 32, 44];
@@ -10,68 +11,36 @@ let maxColor = [0, 0, 0];
 const baseBackgroundColor = [26, 32, 44];
 const redColor = [255, 0, 0];
 
-// Prestige (Hue Shift) variables
-let hueShifts = 0;
-let baseSoftcapPower = new OmegaNum(1);
-let softcapPower = baseSoftcapPower;
-let showHueShiftPrompt = false;
-let hueShiftModal = document.getElementById('hue-shift-modal');
-let confirmHueShiftButton = document.getElementById('confirm-hue-shift');
-
-// --- Antihole Variables ---
-let antiholeUnlocked = false;
-let showAntiholePrompt = false;
-let antiholeModal = document.getElementById('antihole-modal');
-let confirmAntiholeButton = document.getElementById('confirm-antihole');
-let antiholeSize = new OmegaNum(1);
-let squareShrinkMaxLevel = 10; // base cap
-
 // DOM elements for tabbed sidebar
-let sidebarTabs = document.getElementById('sidebar');
-let tabShrinking = document.getElementById('tab-shrinking');
-let tabAntihole = document.getElementById('tab-antihole');
-let shrinkingPanel = document.getElementById('shrinking-panel');
-let antiholePanel = document.getElementById('antihole-panel');
-let displayAntihole = document.getElementById('display-antihole');
+let sidebarTabs = document.getElementById("sidebar");
+let tabShrinking = document.getElementById("tab-shrinking");
+let tabAutomation = document.getElementById("tab-automation");
+let tabAntihole = document.getElementById("tab-antihole");
+let shrinkingPanel = document.getElementById("shrinking-panel");
+let automationPanel = document.getElementById("automation-panel");
+let antiholePanel = document.getElementById("antihole-panel");
+let displayAntihole = document.getElementById("display-antihole");
+let displayAntiholeAutomation = document.getElementById(
+    "display-antihole-automation"
+);
 
 // Upgrades
 let upgrades = {
-  autoShrink: {
-    purchased: false,
-    cost: new OmegaNum(2),
-    button: document.getElementById('auto-shrink-upgrade')
-  },
-  squareShrink: {
-    level: 0,
-    baseCost: new OmegaNum(1).div(0.95),
-    cost: new OmegaNum(1).div(0.95),
-    button: document.getElementById('square-shrink-upgrade')
-  }
-};
-
-// Antihole‐panel upgrades
-let antiholeUpgrades = {
-  squareLimit: {
-    level: 0,
-    baseCost: new OmegaNum(1.5),
-    cost: new OmegaNum(1.5),
-    button: document.getElementById('antihole-square-limit')
-  },
-  keepAuto: {
-    purchased: false,
-    cost: new OmegaNum(5),
-    button: document.getElementById('antihole-keep-auto')
-  },
-  divideByThree: {
-    level: 0,
-    baseCost: new OmegaNum(10),
-    cost: new OmegaNum(10),
-    button: document.getElementById('antihole-divide-rate')
-  }
+    autoShrink: {
+        purchased: false,
+        cost: new OmegaNum(2),
+        button: document.getElementById("auto-shrink-upgrade"),
+    },
+    squareShrink: {
+        level: 0,
+        baseCost: new OmegaNum(1).div(0.95),
+        cost: new OmegaNum(1).div(0.95),
+        button: document.getElementById("square-shrink-upgrade"),
+    },
 };
 
 // Shrink factors
-let shrinkDivide = new OmegaNum(1)
+let shrinkDivide = new OmegaNum(1);
 let baseShrinkClickFactor = new OmegaNum(1).div(0.9995);
 let shrinkClickFactor = baseShrinkClickFactor;
 let adjustedShrinkClick = shrinkClickFactor;
@@ -80,10 +49,10 @@ let shrinkAutoFactor = baseShrinkAutoFactor;
 let adjustedShrinkAuto = shrinkAutoFactor;
 
 // Save‐popup elements
-const savePopup = document.getElementById('save-popup');
+const savePopup = document.getElementById("save-popup");
 function showSavePopup() {
-  savePopup.classList.add('show');
-  setTimeout(() => savePopup.classList.remove('show'), 2000);
+    savePopup.classList.add("show");
+    setTimeout(() => savePopup.classList.remove("show"), 2000);
 }
 
 loadGame();
@@ -91,391 +60,378 @@ updateUIVisibility();
 
 // Utility: format value display
 function formatValue(val, digits = 4) {
-  const threshold = new OmegaNum(1e6);
-  if (val.gte(threshold)) {
-    let expString = val.toExponential();
-    if (expString === 'NaNeNaN') expString = val.toString();
-    const [mantissa, exponentStr] = expString.split('e');
-    const exponent = parseInt(exponentStr, 10) - 1;
-    const mantissaNum = parseFloat(mantissa);
-    const reciprocal = 1 / mantissaNum;
-    const raw = reciprocal.toFixed(digits + 2).replace('.', '').padEnd(digits, '0');
-    const digitsStr = raw.slice(0, digits);
-    return `0.-(${exponent})-${digitsStr}`;
-  } else {
-    return OmegaNum.div(1, val).toFixed(6);
-  }
+    const threshold = new OmegaNum(1e6);
+    if (val.gte(threshold)) {
+        let expString = val.toExponential();
+        if (expString === "NaNeNaN") expString = val.toString();
+        const [mantissa, exponentStr] = expString.split("e");
+        const exponent = parseInt(exponentStr, 10) - 1;
+        const mantissaNum = parseFloat(mantissa);
+        const reciprocal = 1 / mantissaNum;
+        const raw = reciprocal
+            .toFixed(digits + 2)
+            .replace(".", "")
+            .padEnd(digits, "0");
+        const digitsStr = raw.slice(0, digits);
+        return `0.-(${exponent})-${digitsStr}`;
+    } else {
+        return OmegaNum.div(1, val).toFixed(6);
+    }
 }
 
 function updateShrinkButton() {
-  if (value.lte('1e30')) {
-    shrinkButton.textContent = `Multiply by ${formatValue(adjustedShrinkClick)}`;
-  } else {
-    shrinkButton.textContent = `Multiply by ${formatValue(adjustedShrinkClick)}\ndue to being smaller than 0.-(29)-0999`;
-  }
+    if (value.lte("1e30")) {
+        shrinkButton.textContent = `Multiply by ${formatValue(
+            adjustedShrinkClick
+        )}`;
+    } if (value.gt("1e30") && value.lte("1e309")) {
+        shrinkButton.textContent = `Multiply by ${formatValue(
+            adjustedShrinkClick
+        )}\ndue to being smaller than 0.-(29)-0999`;
+    } if (value.gt("1e309")) {
+		shrinkButton.textContent = `Multiply by ${formatValue(
+            adjustedShrinkClick
+        )}\ndue to being smaller than 0.-(308)-0999`;
+	}
 }
 
 function interpolateColor(min, max, t) {
-  const r = Math.round(min[0] * (1 - t) + max[0] * t);
-  const g = Math.round(min[1] * (1 - t) + max[1] * t);
-  const b = Math.round(min[2] * (1 - t) + max[2] * t);
-  return `rgb(${r}, ${g}, ${b})`;
+    const r = Math.round(min[0] * (1 - t) + max[0] * t);
+    const g = Math.round(min[1] * (1 - t) + max[1] * t);
+    const b = Math.round(min[2] * (1 - t) + max[2] * t);
+    return `rgb(${r}, ${g}, ${b})`;
 }
 
 function getHueShiftedColor(t) {
-  const shiftFrac = Math.min(hueShifts / 10, 1);
-  const shiftedMin = [
-    minColor[0] + shiftFrac * (255 - minColor[0]),
-    minColor[1] * (1 - shiftFrac),
-    minColor[2] * (1 - shiftFrac)
-  ];
-  return interpolateColor(shiftedMin, maxColor, t);
+    const shiftFrac = Math.min(hueShifts / 10, 1);
+    const shiftedMin = [
+        minColor[0] + shiftFrac * (255 - minColor[0]),
+        minColor[1] * (1 - shiftFrac),
+        minColor[2] * (1 - shiftFrac),
+    ];
+    return interpolateColor(shiftedMin, maxColor, t);
 }
 
 function updateCircleSize() {
-  const minSize = Math.min(window.innerWidth, window.innerHeight);
-  const term = Math.log10(value.toNumber()) / 308;
-  const size = minSize * term;
-  const t = Math.min(1, Math.max(0, size / minSize));
-  const color = getHueShiftedColor(t);
+    const minSize = Math.min(window.innerWidth, window.innerHeight);
+    const term = OmegaNum.log10(value).div(308).toNumber();
+    let size = minSize * term;
+    const t = Math.min(1, Math.max(0, size / minSize));
 
-  circle.style.width = `${size}px`;
-  circle.style.height = `${size}px`;
-  circle.style.backgroundColor = color;
+    let color;
+    if (automationUpgrades.automateAntihole.purchased) {
+        color = "rgb(0, 0, 0)";
+    } else if (automationUpgrades.automateHueShift.level > 0) {
+        const logFraction = OmegaNum.min(OmegaNum.log10(value).div(308), 1);
+        color = getHueShiftedColor(logFraction);
+    } else {
+        color = getHueShiftedColor(t);
+    }
 
-  const requirement = OmegaNum(10).mul(OmegaNum(1e30).pow(hueShifts + 1));
-  const reqTerm = Math.log10(requirement.toNumber()) / 308;
-  const reqSize = minSize * reqTerm;
-  const markerColor = getHueShiftedColor(t);
+    circle.style.width = `${size}px`;
+    circle.style.height = `${size}px`;
+    circle.style.backgroundColor = color;
 
-  const marker = document.getElementById('hue-shift-marker');
-  marker.style.width = `${reqSize}px`;
-  marker.style.height = `${reqSize}px`;
-  marker.style.borderColor = markerColor;
+    const requirement = OmegaNum.min(OmegaNum(10).mul(OmegaNum(1e30).pow(hueShifts + 1)), '1e309');
+    const reqTerm = Math.log10(requirement.toNumber()) / 308;
+    const reqSize = minSize * reqTerm;
+
+    const markerColor = color;
+    const marker = document.getElementById("hue-shift-marker");
+    marker.style.width = `${reqSize}px`;
+    marker.style.height = `${reqSize}px`;
+    marker.style.borderColor = markerColor;
 }
 
 function shrinkClick() {
-  if (value.gt('1e30')) {
-    const ratio = OmegaNum.max(1, value.div('1e30').ln().mul(1000).pow(softcapPower));
-    adjustedShrinkClick = shrinkClickFactor.root(ratio);
-  }
-  value = value.mul(adjustedShrinkClick);
-  valueDisplay.textContent = formatValue(value);
-  updateShrinkButton();
-  updateCircleSize();
-}
-shrinkButton.addEventListener('click', shrinkClick);
-
-function buySquareShrinkUpgrade() {
-  let u = upgrades.squareShrink;
-  if (u.level < squareShrinkMaxLevel && value.gt(u.cost)) {
-    value = value.div(u.cost);
-    u.level++;
-    u.cost = u.baseCost.pow(1.95 * (u.level ** 2));
-    shrinkClickFactor = baseShrinkClickFactor.pow(OmegaNum(2).pow(u.level)).mul(shrinkDivide);
-    shrinkAutoFactor = baseShrinkAutoFactor.pow(OmegaNum(2).pow(u.level)).mul(shrinkDivide);
-    u.button.textContent = `Square shrinking rate\n(Cost: ${formatValue(u.cost)}) ${u.level}/${squareShrinkMaxLevel}`;
-    updateShrinkButton();
-  }
-}
-upgrades.squareShrink.button.addEventListener('click', buySquareShrinkUpgrade);
-
-function buyAutoShrink() {
-  let u = upgrades.autoShrink;
-  if (!u.purchased && value.gt(u.cost)) {
-    value = value.div(u.cost);
-    u.purchased = true;
-    u.button.disabled = true;
-    u.button.textContent = "Auto shrink purchased";
-  }
-}
-upgrades.autoShrink.button.addEventListener('click', buyAutoShrink);
-
-function buyAntiholeUpgrade1() {
-  let au = antiholeUpgrades.squareLimit;
-  let u = upgrades.squareShrink;
-  if (au.level < 10 && antiholeSize.gt(au.cost)) {
-    antiholeSize = antiholeSize.div(au.cost);
-    au.level++;
-    au.cost = au.baseCost.pow(Math.max(1, 1.95 * (au.level ** 2)));
-    squareShrinkMaxLevel = 10 + au.level;
-    au.button.textContent = 
-      `Add 1 to the "Square shrinking rate" upgrade limit\n` +
-      `(Cost: ${formatValue(au.cost)}) ${au.level}/10`;
-    displayAntihole.textContent = formatValue(antiholeSize);
-    u.button.textContent = `Square shrinking rate\n(Cost: ${formatValue(u.cost)}) ${u.level}/${squareShrinkMaxLevel}`;
-  }
-}
-antiholeUpgrades.squareLimit.button.addEventListener('click', buyAntiholeUpgrade1);
-
-function buyAntiholeUpgrade2() {
-  let au = antiholeUpgrades.keepAuto;
-  if (!au.purchased && antiholeSize.gt(au.cost)) {
-    antiholeSize = antiholeSize.div(au.cost);
-    au.purchased = true;
-    au.button.disabled = true;
-    au.button.textContent = "Auto shrink kept";
-    displayAntihole.textContent = formatValue(antiholeSize);
-  }
-}
-antiholeUpgrades.keepAuto.button.addEventListener('click', buyAntiholeUpgrade2);
-
-function buyAntiholeUpgrade3() {
-  let au = antiholeUpgrades.divideByThree;
-  if (au.level < 5 && antiholeSize.gt(au.cost)) {
-    antiholeSize = antiholeSize.div(au.cost);
-    au.level++;
-    au.cost = au.baseCost.pow(Math.max(1, 5 * (au.level ** 2)));
-    shrinkDivide = OmegaNum(3).pow(au.level);
-    shrinkClickFactor = baseShrinkClickFactor.mul(shrinkDivide);
-    shrinkAutoFactor = baseShrinkAutoFactor.mul(shrinkDivide);
-    au.button.textContent = 
-      `Divide the shrinking rate by 3\n` +
-      `(Cost: ${formatValue(au.cost)}) ${au.level}/5`;
-    displayAntihole.textContent = formatValue(antiholeSize);
-  }
-}
-antiholeUpgrades.divideByThree.button.addEventListener('click', buyAntiholeUpgrade3);    
-
-function triggerHueShift() {
-  hueShifts++;
-  softcapPower = baseSoftcapPower.mul(OmegaNum.pow(.5, hueShifts));
-  resetGameProgress();
-  hueShiftModal.style.display = 'none';
-  showHueShiftPrompt = false;
-}
-confirmHueShiftButton.addEventListener('click', triggerHueShift);
-
-function triggerAntihole() {
-  // **Reset hueShifts on Antihole**
-  hueShifts = 0;
-  softcapPower = new OmegaNum(1);
-  antiholeSize = antiholeSize.mul(2);
-  antiholeUnlocked = true;
-  resetGameProgress();
-  antiholeModal.style.display = 'none';
-  showAntiholePrompt = false;
-  updateUIVisibility();
-}
-confirmAntiholeButton.addEventListener('click', triggerAntihole);
-
-function resetGameProgress() {
-  value = new OmegaNum(1);
-  // reset Shrinking upgrades
-  upgrades.squareShrink.level = 0;
-  upgrades.squareShrink.cost = upgrades.squareShrink.baseCost;
-  upgrades.squareShrink.button.textContent = 
-    `Square shrinking rate\n(Cost: ${formatValue(upgrades.squareShrink.baseCost)}) 0/${squareShrinkMaxLevel}`;
-  if (!antiholeUpgrades.keepAuto.purchased) {
-    upgrades.autoShrink.purchased = false;
-    upgrades.autoShrink.button.disabled = false;
-    upgrades.autoShrink.button.textContent = 
-      `Auto shrink\n(Cost: ${formatValue(upgrades.autoShrink.cost)})`;
-  }
-  shrinkClickFactor = baseShrinkClickFactor.mul(shrinkDivide);
-  shrinkAutoFactor = baseShrinkAutoFactor.mul(shrinkDivide);
-  updateBackgroundColor();
-  updateShrinkButton();
-  updateCircleSize();
-}
-
-function updateUIVisibility() {
-  if (antiholeUnlocked) {
-    sidebarTabs.style.display = 'flex';
-    tabShrinking.classList.add('active');
-    tabAntihole.classList.remove('active');
-    shrinkingPanel.style.display = 'block';
-    antiholePanel.style.display = 'none';
-  } else {
-    sidebarTabs.style.display = 'none';
-    shrinkingPanel.style.display = 'block';
-    antiholePanel.style.display = 'none';
-  }
-}
-
-// Tab switching
-tabShrinking.addEventListener('click', () => {
-  tabShrinking.classList.add('active');
-  tabAntihole.classList.remove('active');
-  shrinkingPanel.style.display = 'block';
-  antiholePanel.style.display = 'none';
-});
-tabAntihole.addEventListener('click', () => {
-  tabAntihole.classList.add('active');
-  tabShrinking.classList.remove('active');
-  antiholePanel.style.display = 'block';
-  shrinkingPanel.style.display = 'none';
-});
-
-function tick() {
-  const antiholeThreshold = OmegaNum(10).mul(OmegaNum(2).pow(1024));
-  // cap value at whichever prestige is next
-  value = OmegaNum.min(
-    value,
-    OmegaNum.min(
-      OmegaNum(10).mul(OmegaNum(1e30).pow(hueShifts + 1)),
-      antiholeThreshold
-    )
-  );
-
-  // Hue shift prompt
-  if (!showHueShiftPrompt && value.gte(OmegaNum(10).mul(OmegaNum(1e30).pow(hueShifts + 1)))) {
-    const grantedLevels = Math.min(hueShifts + 1, 10);
-    document.getElementById('hue-shift-effects').innerHTML =
-      `This will automatically grant<br><strong>${grantedLevels}</strong> level${grantedLevels === 1 ? '' : 's'} ` +
-      `of the <em>"Square shrinking rate"</em> upgrade when affordable<br>and square root the softcap.`;
-    hueShiftModal.style.display = 'flex';
-    showHueShiftPrompt = true;
-  }
-
-  // Antihole prompt
-  if (value.gte(antiholeThreshold) && !showAntiholePrompt) {
-    antiholeModal.style.display = 'flex';
-    showAntiholePrompt = true;
-  }
-
-  // Auto-shrink and click adjustments
-  updateShrinkButton();
-  updateCircleSize();
-
-  adjustedShrinkClick = shrinkClickFactor;
-  if (value.gt('1e30')) {
-    const ratio = OmegaNum.max(1, value.div('1e30').ln().mul(1000).pow(softcapPower));
-    adjustedShrinkClick = shrinkClickFactor.root(ratio);
-  }
-  if (value.gt(0) && upgrades.autoShrink.purchased) {
-    adjustedShrinkAuto = shrinkAutoFactor;
-    if (value.gt('1e30')) {
-      const ratio = OmegaNum.max(1, value.div('1e30').ln().mul(1000).pow(softcapPower));
-      adjustedShrinkAuto = shrinkAutoFactor.root(ratio);
+	adjustedShrinkClick = shrinkClickFactor;
+    if (value.gt("1e30")) {
+        let ratio = OmegaNum.max(
+            1,
+            value.div("1e30").ln().mul(1000).pow(softcapPower)
+        );
+        if (value.gt("1e309")) {
+            ratio = OmegaNum.max(
+                1,
+                value.div("1e30").ln().mul(1000).pow(softcapPower)
+            ).mul(OmegaNum.max(1, value.div("1e30").ln().mul(1000)));
+        }
+        adjustedShrinkClick = shrinkClickFactor.root(ratio);
     }
-    value = value.mul(adjustedShrinkAuto);
-  }
-
-  // Auto-buy squareShrink up to hueShifts or antihole‐extended cap
-  let u = upgrades.squareShrink;
-  if (u.level < squareShrinkMaxLevel && value.gt(u.cost) && u.level < hueShifts) {
-    u.level++;
-    u.cost = u.baseCost.pow(1.95 * (u.level ** 2));
-    shrinkClickFactor = baseShrinkClickFactor.pow(OmegaNum(2).pow(u.level)).mul(shrinkDivide);
-    shrinkAutoFactor = baseShrinkAutoFactor.pow(OmegaNum(2).pow(u.level)).mul(shrinkDivide);
-    u.button.textContent = 
-      `Square shrinking rate\n(Cost: ${formatValue(u.cost)}) ${u.level}/${squareShrinkMaxLevel}`;
-    updateShrinkButton();
-  }
-
-  valueDisplay.textContent = formatValue(value);
-  if (antiholeUnlocked) {
-    displayAntihole.textContent = formatValue(antiholeSize);
-  }
-}
-setInterval(tick, 50);
-
-// Save & Load
-function saveGame() {
-  const saveData = {
-    value: value.toString(),
-    hueShifts,
-    squareShrinkLevel: upgrades.squareShrink.level,
-    autoShrinkPurchased: upgrades.autoShrink.purchased,
-    shrinkClickFactor: shrinkClickFactor.toString(),
-    shrinkAutoFactor: shrinkAutoFactor.toString(),
-    softcapPower: softcapPower.toString(),
-    // Antihole
-    antiholeUnlocked,
-    antiholeSize: antiholeSize.toString(),
-    shrinkDivide: shrinkDivide.toString(),
-    antiholeUpgrade1Level: antiholeUpgrades.squareLimit.level,
-    antiholeUpgrade1Cost: antiholeUpgrades.squareLimit.cost.toString(),
-    antiholeUpgrade2Level: antiholeUpgrades.keepAuto.purchased,
-    antiholeUpgrade2Cost: antiholeUpgrades.keepAuto.cost.toString(),
-    antiholeUpgrade3Level: antiholeUpgrades.divideByThree.level,
-    antiholeUpgrade3Cost: antiholeUpgrades.divideByThree.cost.toString()
-  };
-  localStorage.setItem('GameSave', JSON.stringify(saveData));
-}
-
-function loadGame() {
-  const s = localStorage.getItem('GameSave');
-  if (!s) return;
-  try {
-    const d = JSON.parse(s);
-    value = new OmegaNum(d.value);
-    hueShifts = d.hueShifts || 0;
-    upgrades.squareShrink.level = d.squareShrinkLevel || 0;
-    upgrades.autoShrink.purchased = d.autoShrinkPurchased || false;
-    shrinkClickFactor = new OmegaNum(d.shrinkClickFactor);
-    shrinkAutoFactor = new OmegaNum(d.shrinkAutoFactor);
-    softcapPower = new OmegaNum(d.softcapPower);
-
-    // Antihole restore
-    antiholeUnlocked = d.antiholeUnlocked || false;
-    antiholeSize = new OmegaNum(d.antiholeSize || 1);
-    shrinkDivide = new OmegaNum(d.shrinkDivide || 1);
-    antiholeUpgrades.squareLimit.level = d.antiholeUpgrade1Level || 0;
-    antiholeUpgrades.squareLimit.cost = new OmegaNum(d.antiholeUpgrade1Cost || 1.5);
-    antiholeUpgrades.keepAuto.purchased = d.antiholeUpgrade2Level || false;
-    antiholeUpgrades.keepAuto.cost = new OmegaNum(d.antiholeUpgrade2Cost || 5);
-    antiholeUpgrades.divideByThree.level = d.antiholeUpgrade3Level || 0;
-    antiholeUpgrades.divideByThree.cost = new OmegaNum(d.antiholeUpgrade3Cost || 10);
-    squareShrinkMaxLevel = 10 + antiholeUpgrades.squareLimit.level;
-
-    // Update UI text
-    upgrades.squareShrink.cost = upgrades.squareShrink.baseCost.pow(OmegaNum.max(1,1.95 * (upgrades.squareShrink.level ** 2)));
-    upgrades.squareShrink.button.textContent = 
-      `Square shrinking rate\n(Cost: ${formatValue(upgrades.squareShrink.cost)}) ${upgrades.squareShrink.level}/${squareShrinkMaxLevel}`;
-    upgrades.autoShrink.button.disabled = upgrades.autoShrink.purchased;
-    upgrades.autoShrink.button.textContent = 
-      upgrades.autoShrink.purchased 
-        ? "Auto shrink purchased" 
-        : `Auto shrink\n(Cost: ${formatValue(upgrades.autoShrink.cost)})`;
-
-    antiholeUpgrades.squareLimit.button.textContent =
-      `Add 1 to the "Square shrinking rate" upgrade limit\n` +
-      `(Cost: ${formatValue(antiholeUpgrades.squareLimit.cost)}) ${antiholeUpgrades.squareLimit.level}/10`;
-    antiholeUpgrades.keepAuto.button.textContent =
-      antiholeUpgrades.keepAuto.purchased
-        ? "Auto shrink kept"
-        : `Keep auto shrink\n(Cost: ${formatValue(antiholeUpgrades.keepAuto.cost)})`;
-    antiholeUpgrades.divideByThree.button.textContent =
-      `Divide the shrinking rate by 3\n` +
-      `(Cost: ${formatValue(antiholeUpgrades.divideByThree.cost)}) ${antiholeUpgrades.divideByThree.level}/5`;
-    displayAntihole.textContent = formatValue(antiholeSize);
-
-    updateUIVisibility();
+    value = value.mul(adjustedShrinkClick);
     valueDisplay.textContent = formatValue(value);
     updateShrinkButton();
     updateCircleSize();
-  } catch (e) {
-    console.error('Failed to load save:', e);
-  }
 }
+shrinkButton.addEventListener("click", shrinkClick);
+
+function buySquareShrinkUpgrade() {
+    let u = upgrades.squareShrink;
+    if (u.level < squareShrinkMaxLevel && value.gt(u.cost)) {
+        value = value.div(u.cost);
+        u.level++;
+        u.cost = u.baseCost.pow(1.95 * u.level ** 2);
+        shrinkClickFactor = baseShrinkClickFactor
+            .pow(OmegaNum(2).pow(u.level))
+            .mul(shrinkDivide);
+        shrinkAutoFactor = baseShrinkAutoFactor
+            .pow(OmegaNum(2).pow(u.level))
+            .mul(shrinkDivide);
+        u.button.textContent = `Square shrinking rate\n(Cost: ${formatValue(
+            u.cost
+        )}) ${u.level}/${squareShrinkMaxLevel}`;
+        updateShrinkButton();
+    }
+}
+upgrades.squareShrink.button.addEventListener("click", buySquareShrinkUpgrade);
+
+function buyAutoShrink() {
+    let u = upgrades.autoShrink;
+    if (!u.purchased && value.gt(u.cost)) {
+        value = value.div(u.cost);
+        u.purchased = true;
+        u.button.disabled = true;
+        u.button.textContent = "Auto shrink purchased";
+    }
+}
+upgrades.autoShrink.button.addEventListener("click", buyAutoShrink);
+
+function resetGameProgress() {
+    value = new OmegaNum(1);
+    // reset Shrinking upgrades
+    upgrades.squareShrink.level = 0;
+    upgrades.squareShrink.cost = upgrades.squareShrink.baseCost;
+    upgrades.squareShrink.button.textContent = `Square shrinking rate\n(Cost: ${formatValue(
+        upgrades.squareShrink.baseCost
+    )}) 0/${squareShrinkMaxLevel}`;
+    if (!antiholeUpgrades.keepAuto.purchased) {
+        upgrades.autoShrink.purchased = false;
+        upgrades.autoShrink.button.disabled = false;
+        upgrades.autoShrink.button.textContent = `Auto shrink\n(Cost: ${formatValue(
+            upgrades.autoShrink.cost
+        )})`;
+    }
+    shrinkClickFactor = baseShrinkClickFactor.mul(shrinkDivide);
+    shrinkAutoFactor = baseShrinkAutoFactor.mul(shrinkDivide);
+    updateBackgroundColor();
+    updateShrinkButton();
+    updateCircleSize();
+}
+
+function updateUIVisibility() {
+    if (antiholeUnlocked) {
+        sidebarTabs.style.display = "flex";
+        tabShrinking.classList.add("active");
+        tabAntihole.classList.remove("active");
+        shrinkingPanel.style.display = "block";
+        antiholePanel.style.display = "none";
+    } else {
+        sidebarTabs.style.display = "none";
+        shrinkingPanel.style.display = "block";
+        antiholePanel.style.display = "none";
+    }
+}
+
+// Tab switching
+tabShrinking.addEventListener("click", () => {
+    tabShrinking.classList.add("active");
+    tabAutomation.classList.remove("active");
+    tabAntihole.classList.remove("active");
+
+    shrinkingPanel.style.display = "block";
+    automationPanel.style.display = "none";
+    antiholePanel.style.display = "none";
+});
+
+tabAutomation.addEventListener("click", () => {
+    tabAutomation.classList.add("active");
+    tabShrinking.classList.remove("active");
+    tabAntihole.classList.remove("active");
+
+    shrinkingPanel.style.display = "none";
+    automationPanel.style.display = "block";
+    antiholePanel.style.display = "none";
+});
+
+tabAntihole.addEventListener("click", () => {
+    tabAntihole.classList.add("active");
+    tabShrinking.classList.remove("active");
+    tabAutomation.classList.remove("active");
+
+    shrinkingPanel.style.display = "none";
+    automationPanel.style.display = "none";
+    antiholePanel.style.display = "block";
+});
+
+function tick() {
+    const antiholeThreshold = OmegaNum(10).mul(OmegaNum(2).pow(1024));
+    // cap value at whichever prestige is next
+    if (!automationUpgrades.automateAntihole.purchased) {
+        value = OmegaNum.min(
+            value,
+            OmegaNum.min(
+                OmegaNum(10).mul(OmegaNum(1e30).pow(hueShifts + 1)),
+                antiholeThreshold
+            )
+        );
+    }
+
+    // Hue shift prompt
+    if (automationUpgrades.automateHueShift.level == 0) {
+        if (
+            !showHueShiftPrompt &&
+            value.gte(OmegaNum(10).mul(OmegaNum(1e30).pow(hueShifts + 1)))
+        ) {
+            const grantedLevels = Math.min(hueShifts + 1, 10);
+            document.getElementById("hue-shift-effects").innerHTML =
+                `This will automatically grant<br><strong>${grantedLevels}</strong> level${
+                    grantedLevels === 1 ? "" : "s"
+                } ` +
+                `of the <em>"Square shrinking rate"</em> upgrade when affordable<br>and square root the softcap.`;
+            hueShiftModal.style.display = "flex";
+            showHueShiftPrompt = true;
+        }
+    } else {
+        if (
+            value.gte(OmegaNum(10).mul(OmegaNum(1e30).pow(hueShifts + 1))) &&
+            hueShifts < 10
+        ) {
+            triggerHueShift();
+        }
+    }
+
+    // Antihole prompt
+    if (!automationUpgrades.automateAntihole.purchased) {
+        if (value.gte(antiholeThreshold) && !showAntiholePrompt) {
+            antiholeModal.style.display = "flex";
+            showAntiholePrompt = true;
+        }
+    } else {
+        if (
+            value.gte(antiholeThreshold) &&
+            automationUpgrades.automateAntihole.enabled
+        ) {
+            triggerAntihole();
+        }
+    }
+
+    // Auto-shrink and click adjustments
+    updateShrinkButton();
+    updateCircleSize();
+    updateBackgroundColor();
+
+    adjustedShrinkClick = shrinkClickFactor;
+    if (value.gt("1e30")) {
+        let ratio = OmegaNum.max(
+            1,
+            value.div("1e30").ln().mul(1000).pow(softcapPower)
+        );
+        if (value.gt("1e309")) {
+            ratio = OmegaNum.max(
+                1,
+                value.div("1e30").ln().mul(1000).pow(softcapPower)
+            ).mul(OmegaNum.max(1, value.div("1e30").ln().mul(1000)));
+        }
+        adjustedShrinkClick = shrinkClickFactor.root(ratio);
+    }
+    if (upgrades.autoShrink.purchased) {
+        adjustedShrinkAuto = shrinkAutoFactor;
+        if (value.gt("1e30")) {
+            let ratio = OmegaNum.max(
+                1,
+                value.div("1e30").ln().mul(1000).pow(softcapPower)
+            );
+            if (value.gt("1e309")) {
+                ratio = OmegaNum.max(
+                    1,
+                    value.div("1e30").ln().mul(1000).pow(softcapPower)
+                ).mul(OmegaNum.max(1, value.div("1e30").ln().mul(1000)));
+            }
+            adjustedShrinkAuto = shrinkAutoFactor.root(ratio);
+        }
+        value = value.mul(adjustedShrinkAuto);
+    }
+
+    // Auto-buy squareShrink up to hueShifts or antihole‐extended cap
+    let u = upgrades.squareShrink;
+    if (
+        u.level < squareShrinkMaxLevel &&
+        value.gt(u.cost) &&
+        u.level < hueShifts
+    ) {
+        u.level++;
+        u.cost = u.baseCost.pow(1.95 * u.level ** 2);
+        shrinkClickFactor = baseShrinkClickFactor
+            .pow(OmegaNum(2).pow(u.level))
+            .mul(shrinkDivide);
+        shrinkAutoFactor = baseShrinkAutoFactor
+            .pow(OmegaNum(2).pow(u.level))
+            .mul(shrinkDivide);
+        u.button.textContent = `Square shrinking rate\n(Cost: ${formatValue(
+            u.cost
+        )}) ${u.level}/${squareShrinkMaxLevel}`;
+        updateShrinkButton();
+    }
+    if (
+        automationUpgrades.automateSquareBuy.purchased &&
+        value.gte(u.cost.mul(10)) &&
+        u.level < squareShrinkMaxLevel
+    ) {
+        buySquareShrinkUpgrade();
+    }
+
+    valueDisplay.textContent = formatValue(value);
+    if (antiholeUnlocked) {
+        displayAntihole.textContent = formatValue(antiholeSize);
+        displayAntiholeAutomation.textContent = formatValue(antiholeSize);
+    }
+}
+setInterval(tick, 50);
 
 // Autosave every 30s **with** popup
 setInterval(() => {
-  saveGame();
-  showSavePopup();
+    saveGame();
+    showSavePopup();
 }, 30000);
 
-window.addEventListener('resize', updateCircleSize);
+setInterval(spawnFlashingStar, 20);
+
+window.addEventListener("resize", updateCircleSize);
 
 function updateFavicon(color) {
-  const canvas = document.createElement('canvas');
-  canvas.width = 64;
-  canvas.height = 64;
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = color;
-  ctx.beginPath();
-  ctx.arc(32, 32, 30, 0, 2 * Math.PI);
-  ctx.fill();
-  document.getElementById('dynamic-favicon').href = canvas.toDataURL('image/png');
+    const canvas = document.createElement("canvas");
+    canvas.width = 64;
+    canvas.height = 64;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(32, 32, 30, 0, 2 * Math.PI);
+    ctx.fill();
+    document.getElementById("dynamic-favicon").href = canvas.toDataURL(
+        "image/png"
+    );
 }
 
 function updateBackgroundColor() {
-  const shiftFraction = Math.min(hueShifts / 10, 1);
-  const bgColor = interpolateColor(baseBackgroundColor, redColor, shiftFraction);
-  document.body.style.backgroundColor = bgColor;
-  updateFavicon(bgColor);  // ← re‑fire favicon draw here
+    let shiftFraction;
+
+    if (automationUpgrades.automateAntihole.purchased) {
+        document.body.style.backgroundColor = minColor;
+    } else {
+        if (automationUpgrades.automateHueShift.level > 1) {
+            shiftFraction = Math.min(Math.log10(value.toNumber()) / 308, 1);
+        } else {
+            shiftFraction = Math.min(hueShifts / 10, 1);
+        }
+
+        const bgColor = interpolateColor(
+            baseBackgroundColor,
+            redColor,
+            shiftFraction
+        );
+        document.body.style.backgroundColor = bgColor;
+    }
+    updateFavicon(document.body.style.backgroundColor);
 }
 
 updateBackgroundColor();

@@ -8,12 +8,14 @@
   <link id="dynamic-favicon" rel="icon" type="image/png" href="">
 </head>
 <body>
+  <div id="star-field"></div>
   <div id="circle"></div>
   <div id="hue-shift-marker"></div>
 
   <!-- LEFT‑SIDEBAR: Shrinking then Antihole -->
   <div id="sidebar">
     <button id="tab-shrinking" class="tab active">Shrinking</button>
+    <button id="tab-automation" class="tab">Automation</button>
     <button id="tab-antihole" class="tab">Antihole</button>
   </div>
 
@@ -25,14 +27,18 @@
   </div>
 
   <div id="right-panel">
+
+
     <div id="shrinking-panel">
       <button id="square-shrink-upgrade">
-        Square shrink rate<br>(Cost: 0.950000) 0/10
+        Square shrinking rate<br>(Cost: 0.950000) 0/10
       </button>
       <button id="auto-shrink-upgrade">
         Auto shrink<br>(Cost: 0.500000)
       </button>
     </div>
+
+
     <div id="antihole-panel" style="display:none;">
       <div class="value-display">
         <span id="display-antihole">1.000000</span>
@@ -43,12 +49,42 @@
       </button>
       <button id="antihole-keep-auto">
         Keep the "Auto shrink" upgrade<br>
-        (Cost: 0.2)
+        (Cost: 0.200000)
       </button>
       <button id="antihole-divide-rate">
         Divide the shrinking rate by 3<br>
-        (Cost: 0.1) 0/5
+        (Cost: 0.100000) 0/5
+      </button>
+      <button id="antihole-double-shrink">
+        Multiply the Antihole shrinking rate by 2<br>
+        (Cost: 0.200000) 0/∞
+      </button>
     </div>
+
+
+    <div id="automation-panel" style="display:none;">
+      <div class="value-display">
+        <span id="display-antihole-automation">1.000000</span>
+      </div>
+      <button id="automate-square-buy">
+        Automatically buy the "Square shrinking rate" upgrade when you have .1x the cost<br>
+        (Cost: 0.100000)
+      </button>
+      <button id="automate-hue-shift">
+        Automatically Hue Shift<br>
+        (Cost: 0.050000) 0/2
+      </button>
+      <button id="automate-antihole">
+        Automatically throw your holes into the Antihole and allow further shrinking<br>
+        (Cost: 0.001)
+      </button>
+      <label id="toggle-antihole-auto-label">
+        <input type="checkbox" id="toggle-antihole-auto" checked>
+        Enable Antihole automation
+      </label>
+    </div>
+
+
   </div>
 
   <!-- modals & save popup… -->
@@ -64,6 +100,11 @@
   <div id="save-popup">Game saved</div>
 
   <script src="OmegaNum.js"></script>
+  <script src="stars.js"></script>
+  <script src="automation.js"></script>
+  <script src="save_load.js"></script>
+  <script src="hueShift.js"></script>
+  <script src="antihole.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
