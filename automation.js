@@ -28,8 +28,7 @@ function buyAutomationUpgrade1() {
         au.purchased = true;
         au.button.disabled = true;
         au.button.textContent = 'Automatically buying the "Square shrinking rate" upgrade when you have .1x the cost';
-        displayAntihole.textContent = formatValue(antiholeSize);
-        displayAntiholeAutomation.textContent = formatValue(antiholeSize);
+        updateAntiholeSizeDisplay(formatValue(antiholeSize));
     }
 }
 automationUpgrades.automateSquareBuy.button.addEventListener('click', buyAutomationUpgrade1)
@@ -47,8 +46,7 @@ function buyAutomationUpgrade2() {
         } else {
             au.button.textContent = 'Automatically Hue Shifting without resetting'
         }
-        displayAntihole.textContent = formatValue(antiholeSize);
-        displayAntiholeAutomation.textContent = formatValue(antiholeSize);
+        updateAntiholeSizeDisplay(formatValue(antiholeSize));
     }
 }
 automationUpgrades.automateHueShift.button.addEventListener('click', buyAutomationUpgrade2)
@@ -62,8 +60,7 @@ function buyAutomationUpgrade3() {
         au.button.textContent = 'Automatically throwing your holes into the Antihole and allowing further shrinking';
         toggleCheckbox.checked = true;
         au.enabled = true;
-        displayAntihole.textContent = formatValue(antiholeSize);
-        displayAntiholeAutomation.textContent = formatValue(antiholeSize);
+        updateAntiholeSizeDisplay(formatValue(antiholeSize));
     }
 }
 automationUpgrades.automateAntihole.button.addEventListener('click', buyAutomationUpgrade3)

@@ -382,8 +382,7 @@ function tick() {
 
     valueDisplay.textContent = formatValue(value);
     if (antiholeUnlocked) {
-        displayAntihole.textContent = formatValue(antiholeSize);
-        displayAntiholeAutomation.textContent = formatValue(antiholeSize);
+		updateAntiholeSizeDisplay(formatValue(antiholeSize));
     }
 }
 setInterval(tick, 50);

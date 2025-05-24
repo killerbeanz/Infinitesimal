@@ -8,6 +8,7 @@
   <link id="dynamic-favicon" rel="icon" type="image/png" href="">
 </head>
 <body>
+  <div id="display-antihole">The Antihole is 1 ballume large</div>
   <div id="star-field"></div>
   <div id="circle"></div>
   <div id="hue-shift-marker"></div>
@@ -40,9 +41,6 @@
 
 
     <div id="antihole-panel" style="display:none;">
-      <div class="value-display">
-        <span id="display-antihole">1.000000</span>
-      </div>
       <button id="antihole-square-limit">
         Add 1 to the "Square shrinking rate" upgrade limit<br>
         (Cost: 0.666667) 0/10
@@ -63,9 +61,6 @@
 
 
     <div id="automation-panel" style="display:none;">
-      <div class="value-display">
-        <span id="display-antihole-automation">1.000000</span>
-      </div>
       <button id="automate-square-buy">
         Automatically buy the "Square shrinking rate" upgrade when you have .1x the cost<br>
         (Cost: 0.100000)
@@ -76,7 +71,7 @@
       </button>
       <button id="automate-antihole">
         Automatically throw your holes into the Antihole and allow further shrinking<br>
-        (Cost: 0.001000)
+        (Cost: 0.001)
       </button>
       <label id="toggle-antihole-auto-label">
         <input type="checkbox" id="toggle-antihole-auto" checked>

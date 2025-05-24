@@ -176,3 +176,14 @@ button:hover {
   0%, 100% { opacity: 0; }
   50% { opacity: 1; }
 }
+
+#display-antihole {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5em;
+  font-weight: bold;
+  color: white;
+  z-index: 1000;
+}

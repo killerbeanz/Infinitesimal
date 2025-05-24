@@ -43,8 +43,7 @@ function buyAntiholeUpgrade1() {
     au.button.textContent = 
       `Add 1 to the "Square shrinking rate" upgrade limit\n` +
       `(Cost: ${formatValue(au.cost)}) ${au.level}/10`;
-    displayAntihole.textContent = formatValue(antiholeSize);
-    displayAntiholeAutomation.textContent = formatValue(antiholeSize);
+    updateAntiholeSizeDisplay(formatValue(antiholeSize));
     u.button.textContent = `Square shrinking rate\n(Cost: ${formatValue(u.cost)}) ${u.level}/${squareShrinkMaxLevel}`;
   }
 }
@@ -57,8 +56,7 @@ function buyAntiholeUpgrade2() {
     au.purchased = true;
     au.button.disabled = true;
     au.button.textContent = "Auto shrink kept";
-    displayAntihole.textContent = formatValue(antiholeSize);
-    displayAntiholeAutomation.textContent = formatValue(antiholeSize);
+    updateAntiholeSizeDisplay(formatValue(antiholeSize));
   }
 }
 antiholeUpgrades.keepAuto.button.addEventListener('click', buyAntiholeUpgrade2);
@@ -75,9 +73,7 @@ function buyAntiholeUpgrade3() {
     au.button.textContent = 
       `Divide the shrinking rate by 3\n` +
       `(Cost: ${formatValue(au.cost)}) ${au.level}/5`;
-    displayAntihole.textContent = formatValue(antiholeSize);
-    displayAntiholeAutomation.textContent = formatValue(antiholeSize);
-
+    updateAntiholeSizeDisplay(formatValue(antiholeSize));
   }
 }
 antiholeUpgrades.divideByThree.button.addEventListener('click', buyAntiholeUpgrade3);
@@ -92,8 +88,7 @@ function buyAntiholeUpgrade4() {
         au.button.textContent =
             `Multiply the Antihole shrinking rate by 2\n` +
             `(Cost: ${formatValue(au.cost)}) ${au.level}/∞`;
-        displayAntihole.textContent = formatValue(antiholeSize);
-        displayAntiholeAutomation.textContent = formatValue(antiholeSize);
+        updateAntiholeSizeDisplay(formatValue(antiholeSize));
     }
 }
 antiholeUpgrades.doubleAntiholeShrink.button.addEventListener('click', buyAntiholeUpgrade4);
@@ -111,5 +106,11 @@ function triggerAntihole() {
     antiholeModal.style.display = 'none';
     showAntiholePrompt = false;
     updateBackgroundColor();
+    updateAntiholeSizeDisplay(formatValue(antiholeSize));
 }
 confirmAntiholeButton.addEventListener('click', triggerAntihole);
+
+function updateAntiholeSizeDisplay(antiholeSize) {
+  const display = document.getElementById("display-antihole");
+  display.textContent = `The Antihole is ${antiholeSize} ballumes large`;
+}
