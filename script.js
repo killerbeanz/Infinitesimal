@@ -88,10 +88,10 @@ function updateShrinkButton() {
         shrinkButton.textContent = `Multiply by ${formatValue(
             adjustedShrinkClick
         )}\ndue to being smaller than 0.-(29)-0999`;
-    } if (value.gt("1e309")) {
+    } if (value.gt("1e310")) {
 		shrinkButton.textContent = `Multiply by ${formatValue(
             adjustedShrinkClick
-        )}\ndue to being smaller than 0.-(308)-0999`;
+        )}\ndue to being smaller than 0.-(309)-0999`;
 	}
 }
 
@@ -150,7 +150,7 @@ function shrinkClick() {
             1,
             value.div("1e30").ln().mul(1000).pow(softcapPower)
         );
-        if (value.gt("1e309")) {
+        if (value.gt("1e310")) {
             ratio = OmegaNum.max(
                 1,
                 value.div("1e30").ln().mul(1000).pow(softcapPower)
@@ -326,7 +326,7 @@ function tick() {
             1,
             value.div("1e30").ln().mul(1000).pow(softcapPower)
         );
-        if (value.gt("1e309")) {
+        if (value.gt("1e310")) {
             ratio = OmegaNum.max(
                 1,
                 value.div("1e30").ln().mul(1000).pow(softcapPower)
@@ -341,7 +341,7 @@ function tick() {
                 1,
                 value.div("1e30").ln().mul(1000).pow(softcapPower)
             );
-            if (value.gt("1e309")) {
+            if (value.gt("1e310")) {
                 ratio = OmegaNum.max(
                     1,
                     value.div("1e30").ln().mul(1000).pow(softcapPower)
